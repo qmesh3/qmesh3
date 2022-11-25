@@ -653,6 +653,7 @@ class Shapes(object):
         # non-contiguous list.
         contiguous_lineFeatures = []
         non_contiguous_lineFeatures = {}
+        i = 0
         for currentLine in self.featureList:
             currentLineGeometry = currentLine.geometry()
             shapeType = currentLineGeometry.wkbType()
@@ -694,7 +695,8 @@ class Shapes(object):
                 # which of their end-points are not connected. This way when we later
                 # try to connect disconnected lines, we do not have to re-connect the
                 # already connected ends.
-                non_contiguous_lineFeatures[currentLine] = [foundStartPoint, foundEndPoint]
+                non_contiguous_lineFeatures[i] = [foundStartPoint, foundEndPoint]
+            i = i + 1
         LOG.debug('        Making contiguous lines: '+\
                            str(len(self.featureList)) +\
                          ' lines in total.')
@@ -704,11 +706,18 @@ class Shapes(object):
         LOG.debug('        Found '+str(len(non_contiguous_lineFeatures)) +\
                          ' lines not connected to other lines.')
 
+
         #Iterate though non-contiguous lines and connect their end-points
         # to other lines. Use a proximity criterion to connect end-points.
         LOG.debug('        Making contiguous lines: Connecting disconnected lines...')
-        for currentLine in non_contiguous_lineFeatures:
-            [foundStartPoint, foundEndPoint] = non_contiguous_lineFeatures[currentLine]
+        i = 0
+        for currentLine in self.featureList:
+            try:
+                non_contiguous_lineFeatures[i]
+            except:
+                i = i+1
+                continue
+            [foundStartPoint, foundEndPoint] = non_contiguous_lineFeatures[i]
             pointsList = currentLine.geometry().asPolyline()
             #If the start point is disconnected, locate the closest point, by
             # searching in all lines. The search includes the current line, in the case
@@ -811,6 +820,7 @@ class Shapes(object):
                 endPoint.setX(closestToEndPoint.x())
                 endPoint.setY(closestToEndPoint.y())
                 currentLine.setGeometry(qgis.core.QgsGeometry.fromPolylineXY(pointsList))
+            i = i+1
         #If global project back onto EPSG:4326
         if self.isGlobal:
             self.projectUnitDiskToLonLat()
