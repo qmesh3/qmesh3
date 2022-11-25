@@ -69,6 +69,7 @@ def main():
               'qmesh3.raster':'qmesh3/raster',
               'qmesh3.publish':'qmesh3/publish',
               },
+          scripts=["qmesh-cli/qmesh"],
           provides=['qmesh3'],
           install_requires=['setuptools-qmesh', 'GFD_basisChangeTools'],
           setup_requires=['setuptools>=35.0.0', 'setuptools_qmesh'],
