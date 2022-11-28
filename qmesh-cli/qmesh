@@ -22,7 +22,7 @@ import numpy as np
 import argparse
 import sys
 import logging
-import qmesh
+import qmesh3 as qmesh
 LOG = logging.getLogger('qmesh')
 
 def outputGridShapeArgument(s):

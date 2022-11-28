@@ -47,7 +47,7 @@ def main():
         
     setup(
           name='qmesh3',
-          version='1.0.3',
+          version='1.0.4',
           description = "Finite Element meshes from GIS data.",
           long_description = long_description,
           author = "The QMesh Development Team.",
@@ -68,11 +68,12 @@ def main():
               'qmesh3.meshg':'qmesh3/mesh',
               'qmesh3.raster':'qmesh3/raster',
               'qmesh3.publish':'qmesh3/publish',
+              'setuptools_qmesh': 'setuptools_qmesh',
               },
           scripts=["qmesh-cli/qmesh"],
           provides=['qmesh3'],
-          install_requires=['setuptools-qmesh', 'GFD_basisChangeTools'],
-          setup_requires=['setuptools>=35.0.0', 'setuptools_qmesh'],
+          install_requires=['GFD_basisChangeTools'],
+          setup_requires=['setuptools>=35.0.0'],
           extras_require={'RDM':['pyrdm']},
           entry_points={
             "distutils.commands":[
