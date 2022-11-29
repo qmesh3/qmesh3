@@ -21,8 +21,10 @@
 import os
 import io
 from setuptools import setup
-from setuptools.command.install import install as setuptools_install
-from setuptools.command.develop import develop as setuptools_develop
+import platform
+from setuptools import distutils
+import importlib
+import subprocess
 
 # Suppress verbose debugging Qt messages
 os.environ['QT_LOGGING_RULES'] = "qt5ct.debug=false"
@@ -43,7 +45,7 @@ def main():
     readme_path = os.path.join(current_directory, 'README.rst')
     with io.open(readme_path, encoding='utf-8') as readme_file:
         long_description = readme_file.read()
-
+    check_env()
         
     setup(
           name='qmesh3',
@@ -75,82 +77,35 @@ def main():
           install_requires=['GFD_basisChangeTools'],
           setup_requires=['setuptools>=35.0.0'],
           extras_require={'RDM':['pyrdm']},
-          entry_points={
-            "distutils.commands":[
-                "check_qgis = setuptools_qmesh.command.check_qgis:CheckQgis",
-                "check_gmsh = setuptools_qmesh.command.check_gmsh:CheckGmsh"],
-            "distutils.setup_keywords": [
-                "qgis_path            = setuptools_qmesh.dist:assert_path",
-                "gmsh_bin_path        = setuptools_qmesh.dist:assert_path",
-                "include_git_sha_key  = setuptools.dist:assert_bool",
-                "include_full_license = setuptools.dist:assert_bool",
-                "include_author_ids   = setuptools.dist:assert_bool"],
-            "egg_info.writers": [
-                "QGIS_PATH     = setuptools_qmesh.command.egg_info:write_qgis_path",
-                "GMSH_BIN_PATH = setuptools_qmesh.command.egg_info:write_gmsh_bin_path",
-                "GIT_SHA_KEY   = setuptools_qmesh.command.egg_info:write_git_sha_key",
-                "LICENSE       = setuptools_qmesh.command.egg_info:write_full_license",
-                "AUTHORS.md    = setuptools_qmesh.command.egg_info:write_author_ids"],
-            },
           include_git_sha_key=True,
           include_full_license=True,
           include_author_ids=True,
           license='GPLv3',
           test_suite = "tests",
           keywords = ['GIS', 'mesh generation'],
-          cmdclass={'install': Install,
-                    'develop': Develop}
         )
 
-class Install(setuptools_install):
-    '''Class invoking installation procedure.
+# check the right tools are installed
+def check_env():
+    msg = ""
+    try:
+        qgis = importlib.import_module('qgis')
+        qgis_python_path = qgis.__path__[0]
+        qgis_path = '/'
+    except ModuleNotFoundError:
+        msg = 'Host system does not appear to have a qgis installation.'
+        msg = 'Qmesh uses qgis for GIS operations, hence qgis must be installed. ' + msg
+        raise distutils.errors.DistutilsPlatformError(msg)
 
-    This class is overloading the setuptools install class. The
-    run method of the parent class is run.
-    '''
-    def run(self):
-        from setuptools_qmesh.command.check_gmsh import CheckGmsh
-        from setuptools_qmesh.command.check_qgis import CheckQgis
-        #Check gmsh is installed
-        gmsh_checker = CheckGmsh(self.distribution)
-        gmsh_checker.initialize_options()
-        gmsh_checker.finalize_options()
-        gmsh_checker.run()
-        #Check qgis is installed
-        qgis_checker = CheckQgis(self.distribution)
-        qgis_checker.initialize_options()
-        qgis_checker.finalize_options()
-        qgis_checker.run()
-        #Install qmesh
-        setuptools_install.run(self)
-
-class Develop(setuptools_develop):
-    '''Class invoking installation-in-development-mode procedure.
-
-    Installation in development mode does not copy files to
-    standardised locations. Files in standardised locations are
-    still created, but they point to files in the directory where
-    the source code resides. Thus, the source code in the working
-    directory is run as the installed code. Modifications are
-    immediately propagated to the installation, and development
-    is facilitated. This class is overloading the setuptools
-    develop class. The run method of the parent class is run.
-    '''
-    def run(self):
-        from setuptools_qmesh.command.check_gmsh import CheckGmsh
-        from setuptools_qmesh.command.check_qgis import CheckQgis
-        #Check gmsh is installed
-        gmsh_checker = CheckGmsh(self.distribution)
-        gmsh_checker.initialize_options()
-        gmsh_checker.finalize_options()
-        gmsh_checker.run()
-        #Check qgis is installed
-        qgis_checker = CheckQgis(self.distribution)
-        qgis_checker.initialize_options()
-        qgis_checker.finalize_options()
-        qgis_checker.run()
-        #Install qmesh
-        setuptools_develop.run(self)
+    try:
+        if platform.system() == 'Linux' or platform.system() == 'Darwin':
+            gmsh_bin_path = subprocess.check_output(['which', 'gmsh']).decode('utf-8')
+        if platform.system() == 'Windows':
+            gmsh_bin_path = subprocess.check_output(['where.exe', 'gmsh']).decode('utf-8')
+    except subprocess.CalledProcessError:
+        msg = 'Could not locate a gmsh installation.'
+        msg = 'Qmesh uses gmsh as a mesh generator, hence gmsh must be installed. ' + msg
+        raise distutils.errors.DistutilsSetupError(msg)
 
 if __name__=='__main__':
     main()
