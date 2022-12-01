@@ -1,7 +1,6 @@
 import numpy as np
 import qmesh3
 
-qmesh3.initialise()
 
 #Create the loxodromes at the Western side of the domain
 ldrome_1 = qmesh3.vector.loxodromicLine((-5.0,58.6), -10.0, 100, 0, (np.nan, 60.2), "EPSG:4326")

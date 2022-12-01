@@ -84,7 +84,6 @@ class Test_Raster(unittest.TestCase):
             sys.path.append(self.project_root_path)
             import qmesh3
         qmesh3.LOG.setLevel('WARNING')
-        qmesh3.initialise()
         raster = qmesh3.raster.meshMetricTools.raster()
         raster.fromFile(self.raster_filename)
         targetCoordReferenceSystem = "EPSG:4326"
