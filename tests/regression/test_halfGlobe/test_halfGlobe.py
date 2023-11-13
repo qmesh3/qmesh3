@@ -65,11 +65,6 @@ class TestGlobe(unittest.TestCase):
     def test_halfGlobe(self):
         '''Test meshing of idealised shapes in planet-centered-cartesian. Meshing the northen hemisphere.'''
         function_name = self.test_halfGlobe.__name__
-        #Try initialising qgis API
-        try:
-            qmesh3.initialise()
-        except AssertionError:
-            self.assertTrue(False)
         #Create shapefiles.
         self.create_equator_shapefiles()
         #read-in Shapefiles
@@ -106,8 +101,6 @@ class TestGlobe(unittest.TestCase):
     def test_islandInGlobe(self):
         '''Test meshing the globe, with circular island.'''
         function_name = self.test_islandInGlobe.__name__
-        #Initialise qgis API
-        qmesh3.initialise()
         #Create shapefiles.
         self.create_circular_island()
         #read-in Shapefiles and set-up domain
@@ -137,11 +130,6 @@ class TestGlobe(unittest.TestCase):
     def test_loxodromeBoundRegion(self):
         '''Test meshing of idealised shapes in planet-centered-cartesian. Meshing the region bound between two loxodromes.'''
         import numpy as np
-        #Try initialising qgis API
-        try:
-            qmesh3.initialise()
-        except AssertionError:
-            self.assertTrue(False)
         #Create shapefiles.
         ldrome_1 = qmesh3.vector.loxodromicLine((0.0, -85.0), 50.0,100, 0, (np.nan, 85.0), "EPSG:4326")
         ldrome_2 = qmesh3.vector.loxodromicLine((0.0, -85.0), 40.0,100, 0, (np.nan, 85.0), "EPSG:4326")

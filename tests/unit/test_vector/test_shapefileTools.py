@@ -89,7 +89,6 @@ class Test_Shapes(unittest.TestCase):
             sys.path.append(self.project_root_path)
             import qmesh3
         qmesh3.LOG.setLevel('WARNING')
-        qmesh3.initialise()
         lines = qmesh3.vector.Shapes()
         lines.fromFile(self.multiLines_filename)
         lines.decomposeMultiFeatures()
@@ -106,7 +105,6 @@ class Test_Shapes(unittest.TestCase):
             sys.path.append(self.project_root_path)
             import qmesh3
         qmesh3.LOG.setLevel('WARNING')
-        qmesh3.initialise()
         polygons = qmesh3.vector.Shapes()
         polygons.fromFile(self.multiPolygons_filename)
         polygons.decomposeMultiFeatures()

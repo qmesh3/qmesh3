@@ -104,12 +104,7 @@ class TestNWEuropeanShelf(unittest.TestCase):
         except ImportError:
             os.sys.path.append(self.project_root_path)
             import qmesh3
-        #Try initialising qgis API
-        try:
-            qmesh3.initialise()
-            self.assertTrue(True)
-        except AssertionError:
-            self.assertTrue(False)
+
  
         #Try reading-in prepared boundaries (lines)
         try:

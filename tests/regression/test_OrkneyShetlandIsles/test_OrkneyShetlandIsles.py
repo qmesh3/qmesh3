@@ -185,8 +185,6 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             except ImportError:
                 sys.path.append(self.project_root_path)
                 import qmesh3
-            #Initialise qmesh
-            qmesh3.initialise()
             #Read-in the shapefile describing the domain boundaries, and creating a gmsh file.
             boundaries = qmesh3.vector.Shapes()
             boundaries.fromFile(self.all_boundaries_vector_filename)
@@ -278,8 +276,6 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             except ImportError:
                 sys.path.append(self.project_root_path)
                 import qmesh3
-            #Initialise qmesh
-            qmesh3.initialise()
             #Read-in the shapefile describing the domain boundaries, and creating a gmsh file.
             boundaries = qmesh3.vector.Shapes()
             boundaries.fromFile(self.all_boundaries_vector_filename)
@@ -371,8 +367,6 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             except ImportError:
                 sys.path.append(self.project_root_path)
                 import qmesh3
-            #Initialise qmesh
-            qmesh3.initialise()
             #Read-in the shapefile describing the domain boundaries, and creating a gmsh file.
             boundaries = qmesh3.vector.Shapes()
             boundaries.fromFile(self.all_boundaries_vector_filename)
@@ -471,7 +465,6 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
                 import qmesh3
             import qgis.core
             import numpy
-            qmesh3.initialise()
             #Read-in the shapefile describing the domain boundaries, and creating a gmsh file.
             boundaries = qmesh3.vector.Shapes()
             boundaries.fromFile(self.all_boundaries_vector_filename)

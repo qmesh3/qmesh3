@@ -59,8 +59,8 @@ class TestProjections(unittest.TestCase):
 
     def setUp(self):
             '''Method setting-up test fixture.'''
-            qmesh3.initialise()
-
+            pass
+        
     def tearDown(self):
         #Clean-up
         unwantedFiles = glob.glob('test_points.*')
