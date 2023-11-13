@@ -188,7 +188,6 @@ def generate_mesh(args):
     LOG.info("Generating mesh...")
 
     # Initialise QGIS
-    qmesh.initialise(qgis_install_path=args.qgis_install_path)
     boundary_file = args.input_file
     polygon_file = args.polygon
     default_PhysID = args.default_PhysID
@@ -251,7 +250,6 @@ def generate_mesh(args):
 def rst2fld(args):
     """ Write raster data to a field. """
     # Initialise QGIS
-    qmesh.initialise(qgis_install_path=args.qgis_install_path)
     inputRasterFilename = args.inputRasterFilename
     outputFilename = args.outputFilename
     sourceCoordReferenceSystem = args.sourceCoordReferenceSystem
