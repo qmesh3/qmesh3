@@ -72,7 +72,7 @@ def main():
               },
           scripts=["qmesh-cli/qmesh"],
           provides=['qmesh3'],
-          install_requires=['GFD_basisChangeTools'],
+          install_requires=['GFD_basisChangeTools', 'gitpython'],
           setup_requires=['setuptools>=35.0.0'],
           extras_require={'RDM':['pyrdm']},
           entry_points={
