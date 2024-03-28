@@ -554,31 +554,41 @@ class Domain(object):
         #Ensure features stored into line-shapes describe single-part lines.
         # Also, extract the 'PhysID' attribute, if it exists and append it
         # to appropriate list.
-        lines = []
+        multilines = []
         linePhysIDList = []
         for feature in self.geometryLineShapes.featureList:
             featureGeometry = feature.geometry()
             shapeType = featureGeometry.wkbType()
-            if not (shapeType == qgis.core.QgsWkbTypes.LineString or \
-                    shapeType == qgis.core.QgsWkbTypes.LineString25D):
-                msg = 'Method shp2geo can only be invoked on single-part line objects.\n'
+            if (shapeType == qgis.core.QgsWkbTypes.LineString or \
+                shapeType == qgis.core.QgsWkbTypes.LineString25D):
+                multilines.append([featureGeometry.asPolyline()])
+            elif (shapeType == qgis.core.QgsWkbTypes.MultiLineString or \
+                  shapeType == qgis.core.QgsWkbTypes.MultiLineString25D):
+                multilines.append(featureGeometry.asMultiPolyline())
+            else:
+                msg = 'Method shp2geo can only be invoked on LineString or MultiLineString objects.\n'
                 raise Exception(msg)
-            lines.append(featureGeometry.asPolyline())
+
             featurePhysID = feature.attribute('PhysID')
             linePhysIDList.append(featurePhysID)
         #Ensure features stored into polygon-shapes describes a polygon.
         # Extract the 'PhysID' attribute, if it exists and append it
         # to appropriate list.
-        polygons = []
+        multipolygons = []
         polygonPhysIDList = []
         for feature in self.geometryPolygonShapes.featureList:
             featureGeometry = feature.geometry()
             shapeType = featureGeometry.wkbType()
-            if not (shapeType == qgis.core.QgsWkbTypes.Polygon or \
-                    shapeType == qgis.core.QgsWkbTypes.Polygon25D):
-                msg = 'Method shp2geo can only be invoked on single-part polygon objects.\n'
+            if (shapeType == qgis.core.QgsWkbTypes.Polygon or \
+                shapeType == qgis.core.QgsWkbTypes.Polygon25D):
+                multipolygons.append([featureGeometry.asPolygon()])
+            elif (shapeType == qgis.core.QgsWkbTypes.MultiPolygon or \
+                  shapeType == qgis.core.QgsWkbTypes.MultiPolygon25D):
+                multipolygons.append(featureGeometry.asMultiPolygon())
+            else:
+                msg = 'Method shp2geo can only be invoked on Polygon or MultiPolygon objects.\n'
                 raise Exception(msg)
-            polygons.append(featureGeometry.asPolygon())
+
             featurePhysID = feature.attribute('PhysID')
             polygonPhysIDList.append(featurePhysID)
         # Transform geometries to desired coordinate reference system.
@@ -608,62 +618,65 @@ class Domain(object):
         # First construct a temporary point-dictionary to remove duplicate points
         temp_pointDictionary = {}
         pointsInLines = 0
-        for line in lines:
-            for point in line:
-                pointsInLines += 1
-                temp_pointDictionary[str([point.x(),point.y(),0.0])] = point
+        for lines in multilines:
+            for line in lines:
+                for point in line:
+                    pointsInLines += 1
+                    temp_pointDictionary[str([point.x(),point.y(),0.0])] = point
         LOG.debug('        Found '+str(pointsInLines)+' points - extracted from lines.')
         LOG.debug('        Found '+str(len(temp_pointDictionary))+' points after removing duplicates.')
         #Construct the point-dictionary now duplicates are gone.
-        pointIndex = 1
+        pointIndex = 0
         pointDictionary = {}
         for point in list(temp_pointDictionary.values()):
             pointDictionary[pointIndex] = [point.x(),point.y(), 0.0]
             pointIndex +=1
         #Construct the inverse-point-dictionary
-        pointIndex = 1
+        pointIndex = 0
         invPointDictionary = {}
         for point in list(pointDictionary.values()):
             invPointDictionary[str([point[0],point[1],0.0])] = pointIndex
             pointIndex +=1
         #Construct the line ID-point ID dictionary.
         LOG.debug('        Constructing lineID-pointID dictionary...')
-        lineIndex = 1
+        lineIndex = 0
         lineIDpointID_dictionary = {}
-        for line in lines:
-            pointIndices = []
-            for point in line:
-                pointIndex = invPointDictionary[str([point[0],point[1],0.0])]
-                pointIndices.append(pointIndex)
-            lineIDpointID_dictionary[lineIndex] = pointIndices
-            lineIndex += 1
+        for lines in multilines:
+            for line in lines:
+                pointIndices = []
+                for point in line:
+                    pointIndex = invPointDictionary[str([point[0],point[1],0.0])]
+                    pointIndices.append(pointIndex)
+                lineIDpointID_dictionary[lineIndex] = pointIndices
+                lineIndex += 1
         #Construct the ring ID-point ID dictionary and the ring-ringID dictionary.
         LOG.debug('        Constructing ringID-pointID dictionary...')
-        ringIndex = 1
+        ringIndex = 0
         ringIDPointID_dictionary = {}
         ringID_dictionary = {}
         ringsInPolygonFile = 0
-        for polygon in polygons:
-            for ring in polygon:
-                pointIndices = []
-                for point in ring:
-                    #Consistency check: see if point from polygon is indeed in the
-                    # points maps (i.e. it exists in one of the lines). If not,
-                    # The lines are not consistent with the polygons as they do not
-                    # contain the same points.
-                    #if str([point[0],point[1],0.0]) not in invPointDictionary.keys():
-                    #    msg = 'Polygons and lines appear to be inconsistent, they do not'+\
-                    #          ' contain the same points. Found point with coordinates '+\
-                    #          str([point[0],point[1],0.0]) + ' in a polygon, but the same'+\
-                    #          ' point does not exist in the given lines.\n'
-                    #    raise Exception(msg)
-                    pointIndex = invPointDictionary[str([point[0],point[1],0.0])]
-                    pointIndices.append(pointIndex)
-                ringID_dictionary[ringIndex] = ring
-                ringIDPointID_dictionary[ringIndex] = pointIndices
-                ringIndex += 1
-                ringsInPolygonFile += 1
-        LOG.debug('        Found '+str(len(polygons))+' polygons.')
+        for polygons in multipolygons:
+            for polygon in polygons:
+                for ring in polygon:
+                    pointIndices = []
+                    for point in ring:
+                        #Consistency check: see if point from polygon is indeed in the
+                        # points maps (i.e. it exists in one of the lines). If not,
+                        # The lines are not consistent with the polygons as they do not
+                        # contain the same points.
+                        #if str([point[0],point[1],0.0]) not in invPointDictionary.keys():
+                        #    msg = 'Polygons and lines appear to be inconsistent, they do not'+\
+                        #          ' contain the same points. Found point with coordinates '+\
+                        #          str([point[0],point[1],0.0]) + ' in a polygon, but the same'+\
+                        #          ' point does not exist in the given lines.\n'
+                        #    raise Exception(msg)
+                        pointIndex = invPointDictionary[str([point[0],point[1],0.0])]
+                        pointIndices.append(pointIndex)
+                    ringID_dictionary[ringIndex] = ring
+                    ringIDPointID_dictionary[ringIndex] = pointIndices
+                    ringIndex += 1
+                    ringsInPolygonFile += 1
+        LOG.debug('        Found '+str(len(multipolygons))+' polygons.')
         LOG.debug('        Found '+str(ringsInPolygonFile)+' ring(s) in polygons.')
         #Construct the pointID-ringIDs dictionary
         LOG.debug('        Constructing pointID-ringID dictionary...')
@@ -734,7 +747,7 @@ class Domain(object):
                         raise BadGeometry(msg)
             ringIDLineID_dictionary[ringKey] = contiguousLinesList
         #Re-process dictionaries involving ring IDs: Gmsh wants loops (rings) to
-        # be numbered with the same counter as other line types. However, so 
+        # be numbered with the same counter as other line types. However, so
         # far we have numbered rings starting from 0. Create map oldIndex:newIndex
         # and use it to re-number the dictionaries.
         ringIDrenumbering = {}
@@ -766,18 +779,19 @@ class Domain(object):
         #TBD?surfaceIDPointID_dictionary = {}
         surfaceIDRingID_dictionary = {}
         surfaceIndex = 0
-        for polygon in polygons:
-            #TBD?surfaceIDPointID_dictionary[surfaceIndex] = []
-            surfaceIDRingID_dictionary[surfaceIndex] = []
-            for ring in polygon:
-                ringID = list(ringID_dictionary.keys())[list(ringID_dictionary.values()).index(ring)]
-                surfaceIDRingID_dictionary[surfaceIndex].append(ringID)
-                #TBD?pointsInRing = []
-                #TBD?for point in ring:
-                #TBD?    pointID = invPointDictionary[str([point[0],point[1],0.0])]
-                #TBD?    pointsInRing.append(pointID)
-                #TBD?surfaceIDPointID_dictionary[surfaceIndex].append(pointsInRing)
-            surfaceIndex += 1
+        for polygons in multipolygons:
+            for polygon in polygons:
+                #TBD?surfaceIDPointID_dictionary[surfaceIndex] = []
+                surfaceIDRingID_dictionary[surfaceIndex] = []
+                for ring in polygon:
+                    ringID = list(ringID_dictionary.keys())[list(ringID_dictionary.values()).index(ring)]
+                    surfaceIDRingID_dictionary[surfaceIndex].append(ringID)
+                    #TBD?pointsInRing = []
+                    #TBD?for point in ring:
+                    #TBD?    pointID = invPointDictionary[str([point[0],point[1],0.0])]
+                    #TBD?    pointsInRing.append(pointID)
+                    #TBD?surfaceIDPointID_dictionary[surfaceIndex].append(pointsInRing)
+                surfaceIndex += 1
         #TBD?#Construct surfaceID-ringID dictionary.
         #TBD?if verbocityLevel > 2:
         #TBD?    sys.stdout.write('        Constructing surfaceID-ringID dictionary...\n')
