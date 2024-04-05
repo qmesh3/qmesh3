@@ -551,6 +551,19 @@ class Domain(object):
         '''Convert Shapes-objects to gmsh-geometry objects.
         :arg float surfaceRadius: The radius of the sphere approximating Earth's surface
         :returns: Gmsh geometry object'''
+
+        # Transform geometries to desired coordinate reference system.
+        # If target CRS is not PCC, we can use EPSG codes to transform to desired CRS
+        if self.targetCoordRefSystem_string != 'PCC':
+            self.geometryLineShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
+            self.geometryPolygonShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
+        # If target CRS is PCC, we must transform to EPSG:4326, in preparation
+        # to the polar stereographic re-projection later when writing the mesh
+        # generator geometry file (writeGmshGeoFile)
+        elif self.targetCoordRefSystem_string == 'PCC':
+            self.geometryLineShapes.changeCoordRefSystem('EPSG:4326')
+            self.geometryPolygonShapes.changeCoordRefSystem('EPSG:4326')
+
         #Ensure features stored into line-shapes describe single-part lines.
         # Also, extract the 'PhysID' attribute, if it exists and append it
         # to appropriate list.
@@ -591,17 +604,7 @@ class Domain(object):
 
             featurePhysID = feature.attribute('PhysID')
             polygonPhysIDList.append(featurePhysID)
-        # Transform geometries to desired coordinate reference system.
-        # If target CRS is not PCC, we can use EPSG codes to transform to desired CRS
-        if self.targetCoordRefSystem_string != 'PCC':
-            self.geometryLineShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
-            self.geometryPolygonShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
-        # If target CRS is PCC, we must transform to EPSG:4326, in preparation
-        # to the polar stereographic re-projection later when writing the mesh
-        # generator geometry file (writeGmshGeoFile)
-        elif self.targetCoordRefSystem_string == 'PCC':
-            self.geometryLineShapes.changeCoordRefSystem('EPSG:4326')
-            self.geometryPolygonShapes.changeCoordRefSystem('EPSG:4326')
+
         #Construct the following dictionaries (maps):
         # point dictionary: {pointID : point coordinates list (triplet; x,y,z)} (holds information for gmsh definition of points)
         #                   The points are extracted from the line definitions.
