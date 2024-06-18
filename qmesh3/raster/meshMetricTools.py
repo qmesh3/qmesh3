@@ -377,7 +377,7 @@ class raster(object):
         self.variableData = variable[:]
         # Find out the order the dimensions are defined in
         variableShape = self.variableData.shape
-        if variableShape[0] == inputNetCDF.variables[dimensionNames[0]].shape:
+        if variableShape[0] == inputNetCDF.variables[dimensionNames[1]].shape[0]:
             xiID = 0
             etaID = 1
         else:
@@ -403,7 +403,7 @@ class raster(object):
         # reference system, then default to EPSG:4326
         if 'crs' in variableNames:
             crsVariable = inputNetCDF.variables['crs']
-            crsWellKnownText = getattr(crsVariable, 'spatial_ref')
+            crsWellKnownText = getattr(crsVariable, 'spatial_ref').decode('ascii')
             crs = qgis.core.QgsCoordinateReferenceSystem()
             crs.createFromWkt(crsWellKnownText)
             # If user has specified a crs while using this method
