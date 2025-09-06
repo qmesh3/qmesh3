@@ -18,12 +18,8 @@ qmesh is an open-source project distributed under the GNU General Public Licence
 The file `LICENCE <https://bitbucket.org/qmesh-developers/qmesh-containers/raw/HEAD/LICENSE>`_ contains a complete copy of the licence.
 
 The source code is freely available to download and adapt, under the conditions stated in the `LICENCE <https://bitbucket.org/qmesh-developers/qmesh-containers/raw/HEAD/LICENSE>`_ file.
-However, we follow a closed-development approach, where maintenance and development is carried out by the package originators.
-We have opted for this approach to limit the resources needed for development: A larger development team necessitates larger management structures and significant CI/CD expenditure.
-Larger management structures will absorb time intended for other exciting and useful research.
-CI/CD expenditure could threaten our aim to offer a focused package, at no monetary costs to the users.
 
-
+If you wish to contribute, please fork the main repository, create a branch, make your alterations and additions, then create a pull request with your changes. The team will then review the code and commit it to the main respitory.
 
 Documentation 
 ---------------
