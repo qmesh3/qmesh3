@@ -23,7 +23,7 @@ import qmesh3.mesh
 import qmesh3.publish
 import qmesh3.lib
 from qmesh3.config import *
-
+import atexit
 import pkg_resources
 # Suppress verbose debugging Qt messages
 os.environ['QT_LOGGING_RULES'] = "qt5ct.debug=false"
@@ -112,8 +112,52 @@ except NameError:
 #__gmsh_bin_path__ = "/usr/bin"
 #__qgis_path__ = "/usr/local/"
 
-# Initialise qgis
-qgs = QgsApplication([], True, None)
-qgis_install_path='/usr'
-qgs.setPrefixPath(__qgis_path__, True)
-qgs.initQgis()
+qgs = None
+
+def _cleanup_qmesh():
+    """
+    Internal cleanup function. 
+    Safe to call multiple times (idempotent).
+    """
+    global qgs
+    # If qgs is already None, we have already cleaned up. Do nothing.
+    if qgs is None:
+        return
+
+    # Otherwise, shut it down and clear the variable
+    qgs.exitQgis()
+    qgs = None
+
+def start_qmesh():
+    """
+    Internal function to auto-start QGIS on import,
+    BUT only if it isn't already running.
+    """
+    global qgs
+
+    # CHECK: Is QGIS already running? (e.g., started by pytest or another lib)
+    if QgsApplication.instance():
+        qgs = QgsApplication.instance()
+        # We do NOT register an exit handler here, because we didn't start it.
+        # The test runner or the other library is responsible for closing it.
+        return
+
+    # START: If not running, start it now.
+    qgs = QgsApplication([], False)
+    qgis_install_path='/usr'
+    qgs.setPrefixPath(__qgis_path__, True)
+    qgs.initQgis()
+
+    # REGISTER CLEANUP: Ensure it closes when the script ends
+    atexit.register(qgs.exitQgis)
+
+def stop_qmesh():
+    """
+    Manually stops QGIS (e.g. for testing teardown).
+    """
+    # Simply call the safe internal cleanup
+    _cleanup_qmesh()
+
+
+start_qmesh()
+
