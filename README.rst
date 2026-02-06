@@ -34,15 +34,25 @@ Walk Through
 
 *Installation*:
 
-1. install `GD-basisChangeTools/ <https://pypi.org/project/GFD-basisChangeTools/>`_
-2. install `gmsh <https://installati.one/ubuntu/20.04/gmsh/>`_
-3. install `qgis <https://qgis.org/en/site/forusers/alldownloads.html>`_, this installs the newest stable version of QGIS 
+1. install `gmsh <https://installati.one/ubuntu/20.04/gmsh/>`_
+2. install `qgis <https://qgis.org/en/site/forusers/alldownloads.html>`_, this installs the newest stable version of QGIS 
    
    - some people seem to have more success first doing "sudo apt update"\" and then "Sudo apt install qgis", this installs the available QGIS version on the system, which for WSL currently seems to be 3.10.14, for version info pre installation see `here <https://itsfoss.com/apt-install-specific-version/>`_, 
-4. install `qmesh3 <https://pypi.org/project/qmesh3/>`_
-   
+3. install qmesh3
+
    - not found QGIS errors, likely caused by multiple python versions installed locally, can be solved by adding /usr/bin (or the location where your qgis installation lives) to your Pythonpath
-5. testing installation (optional) > "python -m unittest discover <test_directory>"
+
+
+```
+git clone https://github.com/qmesh3/qmesh3.git
+cd qmesh3
+python3 -m venv --system-site-packages .qmesh
+source .qmesh/bin/activate
+pip install .
+```
+
+
+4. testing installation (optional) > "python -m unittest discover <test_directory>"
 
 *tutorials*:
 
