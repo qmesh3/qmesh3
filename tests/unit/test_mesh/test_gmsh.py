@@ -19,6 +19,8 @@
 import unittest
 import sys
 import os
+import qmesh3
+qmesh3.LOG.setLevel('WARNING')
 
 class TestGGeometryPoints(unittest.TestCase):
 
@@ -45,15 +47,6 @@ class TestGGeometryPoints(unittest.TestCase):
     def test_add_point(self):
         '''Testing the point-addition method in qmesh.mesh.Geometry class
         '''
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
         myGeometry = qmesh3.mesh.Geometry()
         # This should fail, the point is only 2D
         try:
@@ -63,16 +56,7 @@ class TestGGeometryPoints(unittest.TestCase):
             return
         self.assertTrue(False)
 
-    # again, should fail as we're passing dodgy data
     def test_add_incorrect_point(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
         qmesh3.LOG.setLevel('WARNING')
         myGeometry = qmesh3.mesh.Geometry()
         try:
@@ -84,15 +68,7 @@ class TestGGeometryPoints(unittest.TestCase):
 
     # again, should fail as we're passing dodgy data
     def test_add_point_as_string(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         try:
             myGeometry.addPoint("hhh")
@@ -102,69 +78,37 @@ class TestGGeometryPoints(unittest.TestCase):
         self.assertTrue(False)
 
     def test_add_existing_point(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
         myGeometry.addPoint([0,1,1])
-        self.assertTrue(myGeometry.points == {0:[0,1,1], 1:[0,1,1]})
+        self.assertTrue(myGeometry.points == {1:[0,1,1], 2:[0,1,1]})
 
     def test_remove_existing_point(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
-        myGeometry.removePoint(0)
+        myGeometry.removePoint(1)
         self.assertTrue(myGeometry.points == {})
 
     def test_remove_nonexisting_point(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
         try:
-            myGeometry.removePoint(1)
+            myGeometry.removePoint(2)
         except AssertionError:
             self.assertTrue(True)
             return
         self.assertTrue(False)
         
     def test_get_point(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
         myGeometry.addPoint([0,1,2])
-        self.assertTrue(myGeometry.getPoint(0) == [0,1,1])
-        self.assertTrue(myGeometry.getPoint(1) == [0,1,2])
+        self.assertTrue(myGeometry.getPoint(1) == [0,1,1])
+        self.assertTrue(myGeometry.getPoint(2) == [0,1,2])
         try:
             self.assertTrue(myGeometry.getPoint(3))
         except AssertionError:
@@ -173,15 +117,7 @@ class TestGGeometryPoints(unittest.TestCase):
         self.assertTrue(False)
 
     def test_get_point_odd_input(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
         myGeometry.addPoint([0,1,2])
@@ -193,52 +129,28 @@ class TestGGeometryPoints(unittest.TestCase):
         self.assertTrue(False)
 
     def test_add_points_from_dict(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         points = {0: [0,1,0], 1:[1,1,2], 2:[3,54,1]}
         myGeometry.addPointsFromDictionary(points)
-        self.assertTrue(myGeometry.getPoint(0) == [0,1,0])
+        self.assertTrue(myGeometry.getPoint(1) == [0,1,0])
 
     def test_add_points_from_dict_existing(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
         points = {0: [0,1,0], 1:[1,1,2], 2:[3,54,1]}
         myGeometry.addPointsFromDictionary(points)
-        self.assertTrue(myGeometry.getPoint(0) == [0,1,1])
+        self.assertTrue(myGeometry.getPoint(1) == [0,1,1])
         self.assertTrue(myGeometry.pointsCount() == 4)
 
     def test_add_points_existing(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         myGeometry = qmesh3.mesh.Geometry()
         myGeometry.addPoint([0,1,1])
         points = [[0,1,0], [1,1,2], [3,54,1]]
         myGeometry.addPoints(points)
-        self.assertTrue(myGeometry.getPoint(0) == [0,1,1])
+        self.assertTrue(myGeometry.getPoint(1) == [0,1,1])
         self.assertTrue(myGeometry.pointsCount() == 4)
 
 
@@ -265,30 +177,14 @@ class TestGGeometryLines(unittest.TestCase):
         self.project_root_path = os.path.split(self.project_tests_path)[0]
 
     def test_addLineSegment(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addLineSegment([0,1])
         self.assertTrue(G.lineSegmentsCount() == 1)
 
     def test_addLineSegment_missingPoint(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         try:
@@ -300,19 +196,11 @@ class TestGGeometryLines(unittest.TestCase):
         self.assertTrue(False)
 
     def test_remove_LineSegment(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addLineSegment([0,1])
-        G.removeLineSegment(0)
+        G.removeLineSegment(1)
         self.assertTrue(G.lineSegmentsCount() == 0)
         try:
             G.removeLineSegment(1)
@@ -322,54 +210,30 @@ class TestGGeometryLines(unittest.TestCase):
         self.assertTrue(False)
 
     def test_getLineSegment(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addLineSegment([0,1])
         self.assertTrue(G.lineSegmentsCount() == 1)
-        line = G.getLineSegment(0)
+        line = G.getLineSegment(1)
         self.assertTrue(line == [0,1])
 
 
     def test_get_nonexistant_LineSegment(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addLineSegment([0,1])
         self.assertTrue(G.lineSegmentsCount() == 1)
         try:
-            G.getLineSegment(1)
+            G.getLineSegment(2)
         except AssertionError:
             self.assertTrue(True)
             return
         self.assertTrue(False)
 
     def test_add_lines_dictionary(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         lines = {0: [0,1], 1:[1,2], 2:[2,3]}
@@ -401,30 +265,14 @@ class TestGGeometryBSplines(unittest.TestCase):
         self.project_root_path = os.path.split(self.project_tests_path)[0]
 
     def test_addBspline(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addBspline([0,1,2])
         self.assertTrue(G.bsplinesCount() == 1)
 
     def test_addBspline_missingPoint(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         try:
@@ -435,19 +283,11 @@ class TestGGeometryBSplines(unittest.TestCase):
         self.assertTrue(False)
 
     def test_remove_Bspline(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addBspline([0,1,2])
-        G.removeBspline(0)
+        G.removeBspline(1)
         self.assertTrue(G.bsplinesCount() == 0)
         try:
             G.removeLineSegment(1)
@@ -457,54 +297,30 @@ class TestGGeometryBSplines(unittest.TestCase):
         self.assertTrue(False)
 
     def test_getBspline(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addBspline([0,1,2])
         self.assertTrue(G.bsplinesCount() == 1)
-        line = G.getBspline(0)
+        line = G.getBspline(1)
         self.assertTrue(line == [0,1,2])
 
 
     def test_get_nonexistant_Bspline(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         G.addBspline([0,1,2])
         self.assertTrue(G.bsplinesCount() == 1)
         try:
-            G.getBspline(1)
+            G.getBspline(2)
         except AssertionError:
             self.assertTrue(True)
             return
         self.assertTrue(False)
 
     def test_add_Bspline_dictionary_nonexisting(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         lines = {0: [0,1,4], 1:[1,2,3]}
@@ -515,15 +331,7 @@ class TestGGeometryBSplines(unittest.TestCase):
         self.assertTrue(False)
 
     def test_add_Bspline_dictionary_nonexisting(self):
-        #Try importing qmesh. If an ImportError exception is thrown, then
-        # the test might be run in a development setting, and see if qmesh
-        # can be found at the project root.
-        try:
-            import qmesh3
-        except ImportError:
-            sys.path.append(self.project_root_path)
-            import qmesh3
-        qmesh3.LOG.setLevel('WARNING')
+        
         G = qmesh3.mesh.Geometry()
         G.addPoints([[0,0,0], [0,1,0], [1,1,0], [1,0,0]])
         lines = {0: [0,1,2], 1:[1,2,3]}

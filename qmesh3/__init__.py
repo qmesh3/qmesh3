@@ -16,7 +16,7 @@
 #    along with QMesh.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from  qgis.core import QgsApplication
-
+import qmesh3.GFD_basisChangeTools
 import qmesh3.vector
 import qmesh3.raster
 import qmesh3.mesh

@@ -21,7 +21,6 @@ import numpy
 import datetime
 from ..__init__ import __git_sha_key__
 from ..__init__ import __version__
-from GFD_basisChangeTools import GFD_basisChangeTools
 LOG = logging.getLogger(__package__)
 
 class Geometry(object):
@@ -555,8 +554,9 @@ class Domain(object):
         # Transform geometries to desired coordinate reference system.
         # If target CRS is not PCC, we can use EPSG codes to transform to desired CRS
         if self.targetCoordRefSystem_string != 'PCC':
-            self.geometryLineShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
-            self.geometryPolygonShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
+            pass
+            #self.geometryLineShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
+            #self.geometryPolygonShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
         # If target CRS is PCC, we must transform to EPSG:4326, in preparation
         # to the polar stereographic re-projection later when writing the mesh
         # generator geometry file (writeGmshGeoFile)
