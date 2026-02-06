@@ -32,7 +32,7 @@ packages = [
     "qmesh3.vector",
     "qmesh3.mesh",
     "qmesh3.raster",
-    "qmesh3.publish"
+    "qmesh3.publish",
 ]
 
 [tool.setuptools.package-dir]
@@ -42,7 +42,6 @@ packages = [
 "qmesh3.mesh" = "qmesh3/mesh" 
 "qmesh3.raster" = "qmesh3/raster"
 "qmesh3.publish" = "qmesh3/publish"
-"setuptools_qmesh" = "setuptools_qmesh"
 
 [project.scripts]
 qmesh = "qmesh3.cli:main"

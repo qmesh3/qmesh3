@@ -470,8 +470,12 @@ class Shapes(object):
         """
         # Make sure input is correct.
         assert isinstance(targetCRS_string, str)
-        targetCRS = qgis.core.QgsCoordinateReferenceSystem()
-        targetCRS.createFromString(targetCRS_string)
+        qgis.core.QgsCoordinateReferenceSystem.invalidateCache()
+        targetCRS = qgis.core.QgsCoordinateReferenceSystem(targetCRS_string)
+        temp = qgis.core.QgsCoordinateReferenceSystem()
+        flag = temp.createFromString("EPSG:27700")
+        
+        #targetCRS.createFromString(targetCRS_string)
         CoordTransformer = qgis.core.QgsCoordinateTransform(
                 self.getCoordRefSystem(), targetCRS, qgis.core.QgsProject.instance() )
         # Check if coordinate transformation is correctly initialised

@@ -21,6 +21,7 @@ import numpy
 import datetime
 from ..__init__ import __git_sha_key__
 from ..__init__ import __version__
+from ..__init__ import GFD_basisChangeTools
 LOG = logging.getLogger(__package__)
 
 class Geometry(object):
@@ -629,20 +630,20 @@ class Domain(object):
         LOG.debug('        Found '+str(pointsInLines)+' points - extracted from lines.')
         LOG.debug('        Found '+str(len(temp_pointDictionary))+' points after removing duplicates.')
         #Construct the point-dictionary now duplicates are gone.
-        pointIndex = 0
+        pointIndex = 1
         pointDictionary = {}
         for point in list(temp_pointDictionary.values()):
             pointDictionary[pointIndex] = [point.x(),point.y(), 0.0]
             pointIndex +=1
         #Construct the inverse-point-dictionary
-        pointIndex = 0
+        pointIndex = 1
         invPointDictionary = {}
         for point in list(pointDictionary.values()):
             invPointDictionary[str([point[0],point[1],0.0])] = pointIndex
             pointIndex +=1
         #Construct the line ID-point ID dictionary.
         LOG.debug('        Constructing lineID-pointID dictionary...')
-        lineIndex = 0
+        lineIndex = 1
         lineIDpointID_dictionary = {}
         for lines in multilines:
             for line in lines:
@@ -654,7 +655,7 @@ class Domain(object):
                 lineIndex += 1
         #Construct the ring ID-point ID dictionary and the ring-ringID dictionary.
         LOG.debug('        Constructing ringID-pointID dictionary...')
-        ringIndex = 0
+        ringIndex = 1
         ringIDPointID_dictionary = {}
         ringID_dictionary = {}
         ringsInPolygonFile = 0
@@ -1180,7 +1181,7 @@ def rotateMsh(inputMshFileName, southPoleCoordinates, invertRotation=False, outp
     f_out = open(output_file,'w')
     foundEndNodes = False
     for inputLine in fileinput.input([inputMshFileName]):
-        if inputLine.strip() == '$EndNodes':
+        if inputLine.strip() == '$EndNodes' or inputLine.strip() == '$EndEntities':
             foundEndNodes = True
         if (inputLineCounter > 4) and not foundEndNodes:
             data = inputLine.split()

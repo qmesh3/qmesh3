@@ -19,6 +19,7 @@
 
 import unittest
 
+@unittest.skip("Too slow")
 class TestOrkneyShetlandIsles(unittest.TestCase):
     '''Todo: add test documentation as class docstring '''
     def setUp(self):

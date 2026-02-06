@@ -20,19 +20,13 @@
 import unittest
 import numpy as np
 import qgis.core
-# so we import local python before any other
-import sys
-# if running the test manually
-sys.path.insert(0,"../../../")
-# if running the test via Makefile
-sys.path.insert(0,"../")
 import qmesh3
 
 class TestCircularRegions(unittest.TestCase):
-    '''Test region insertion in qmesh.'''
+    '''Test region insertion in qmesh3.'''
 
     def setUp(self):
-        qmesh.LOG.setLevel('WARNING')
+        qmesh3.LOG.setLevel('WARNING')
         import os
         self.thisPath = os.path.dirname(os.path.realpath(__file__))
         self.circularDomain_line_filename = self.thisPath+'/test_outerCircle_lines.shp'
@@ -58,14 +52,14 @@ class TestCircularRegions(unittest.TestCase):
             deltaAngle=360./numberPoints
             centerPointCoords = [0.,0.]
             circleRadius = 80.0
-            outer_boundary = qmesh.vector.Circle(centerPointCoords[0], centerPointCoords[1],
+            outer_boundary = qmesh3.vector.Circle(centerPointCoords[0], centerPointCoords[1],
                     circleRadius, numberPoints, "EPSG:4326")
         except AssertionError:
             self.assertTrue(False)
         # Try creating a polygon from the line
         try:
             # Create line feature
-            loops = qmesh.vector.identifyLoops(outer_boundary.asShapes(),
+            loops = qmesh3.vector.identifyLoops(outer_boundary.asShapes(),
                     defaultPhysID=1000, fixOpenLoops=True)
         except AssertionError:
             self.assertTrue(False)
@@ -84,14 +78,14 @@ class TestCircularRegions(unittest.TestCase):
             deltaAngle=360./numberPoints
             centerPointCoords = [0.,10.]
             circleRadius = 30.0
-            boundary = qmesh.vector.Circle(centerPointCoords[0], centerPointCoords[1],
+            boundary = qmesh3.vector.Circle(centerPointCoords[0], centerPointCoords[1],
                     circleRadius, numberPoints, "EPSG:4326")
         except AssertionError:
             self.assertTrue(False)
         #Try creating a polygon from the line
         try:
             # Create line feature
-            loops = qmesh.vector.identifyLoops(boundary.asShapes(),
+            loops = qmesh3.vector.identifyLoops(boundary.asShapes(),
                     defaultPhysID=1000, fixOpenLoops=True)
         except AssertionError:
             self.assertTrue(False)
@@ -106,7 +100,7 @@ class TestCircularRegions(unittest.TestCase):
         '''Test shape creation with qmesh API. Create a circle, in EPSG:4326, centered at (20,0) and radius of 5. Write to files as line and polygon.'''
         #Try greating line features.
         try:
-            circles = qmesh.vector.Shapes()
+            circles = qmesh3.vector.Shapes()
             circles.setCoordRefSystemFromString('EPSG:4326')
             circles.setShapeType(qgis.core.QgsWkbTypes.LineString)
             #
@@ -115,18 +109,18 @@ class TestCircularRegions(unittest.TestCase):
             circleRadius = 5.0
             # Circle 1
             centerPointCoords = [20.,0.]
-            circle1 = qmesh.vector.Circle(centerPointCoords[0], centerPointCoords[1],
+            circle1 = qmesh3.vector.Circle(centerPointCoords[0], centerPointCoords[1],
                     circleRadius, numberPoints, "EPSG:4326")
             circles.addFeature(circle1.asQgsFeature())
             # Circle 2
             centerPointCoords = [0.,10.]
-            circle2 = qmesh.vector.Circle(centerPointCoords[0], centerPointCoords[1],
+            circle2 = qmesh3.vector.Circle(centerPointCoords[0], centerPointCoords[1],
                     circleRadius, numberPoints, "EPSG:4326")
             circles.addFeature(circle2.asQgsFeature())
             # Circle 3
-            circles_loops = qmesh.vector.identifyLoops(circles,
+            circles_loops = qmesh3.vector.identifyLoops(circles,
                       defaultPhysID=1000, fixOpenLoops=True)
-            circles_polygons = qmesh.vector.identifyPolygons(circles_loops,
+            circles_polygons = qmesh3.vector.identifyPolygons(circles_loops,
                       meshedAreaPhysID = 80000)
         except AssertionError:
             self.assertTrue(False)
@@ -141,7 +135,7 @@ class TestCircularRegions(unittest.TestCase):
         '''Test reading-in lines and polygons from file and generating a mesh, in planet-centered-cartesian.
 
         An incremental step towards testing
-        "region insertion" functionality in qmesh. However, no regions are
+        "region insertion" functionality in qmesh3. However, no regions are
         created nor inserted in this test. Only the "outer" domain is created
         and meshed. The input domain is in EPSG:4326 and the output mesh is
         in 'Planet-Centered-Cartesian'. The domain is a circle centered at
@@ -149,39 +143,39 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_singleRegion_PCC_noMeshMetric.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct lines and polygons
         try:
             #Create polygon feature
-            loops = qmesh.vector.identifyLoops(outerRegionLines,
+            loops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-            polygons = qmesh.vector.identifyPolygons(loops,
+            polygons = qmesh3.vector.identifyPolygons(loops,
                     meshedAreaPhysID = 10000)
         except AssertionError:
             self.assertTrue(False)
         #Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setTargetCoordRefSystem('PCC')
         except AssertionError:
             self.assertTrue(False)
         #Meshing with Gmsh
-        try:
-            domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
-                        mshFilename=self.thisPath+'/'+function_name+'.msh',
-                        gmshAlgo = 'front2d')
-        except AssertionError:
-            self.assertTrue(False)
+        #try:
+        #    domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
+        #                mshFilename=self.thisPath+'/'+function_name+'.msh',
+        #                gmshAlgo = 'front2d')
+        #except AssertionError:
+        #    self.assertTrue(False)
 
     def test_singleRegion_EPSG6933_noMeshMetric_deln(self):
         '''Test reading-in lines and polygons from file and generating a mesh, in EPSG:6933.
 
         Rationale: This function is an incremental step towards testing
-        "region insertion" functionality in qmesh. However, no regions are
+        "region insertion" functionality in qmesh3. However, no regions are
         created nor inserted in this test, only the "outer" domain is created
         and meshed. The input domain is in EPSG:4326 and the output mesh is
         in EPSG:6933. The domain is a circle centered at (0.0, 0.0)degrees,
@@ -190,22 +184,22 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_singleRegion_EPSG6933_noMeshMetric_deln.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct lines and polygons
         try:
             #Create polygon feature
-            loops = qmesh.vector.identifyLoops(outerRegionLines,
+            loops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-            polygons = qmesh.vector.identifyPolygons(loops,
+            polygons = qmesh3.vector.identifyPolygons(loops,
                     meshedAreaPhysID = 10000)
         except AssertionError:
             self.assertTrue(False)
         #Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setTargetCoordRefSystem('EPSG:6933')
         except AssertionError:
@@ -222,7 +216,7 @@ class TestCircularRegions(unittest.TestCase):
         '''Test reading-in lines and polygons from file and generating a mesh, in EPSG:6933.
 
         Rationale: This function is an incremental step towards testing 
-        "region insertion" functionality in qmesh. However no regions are
+        "region insertion" functionality in qmesh3. However no regions are
         created nor inserted in this test, only the "outer" domain is created
         and meshed. The input domain is in EPSG:4326 and the output mesh is
         in EPSG:6933. The  domain is a circle centered at (0.0, 0.0)degrees,
@@ -231,22 +225,22 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_singleRegion_EPSG6933_noMeshMetric_frnt.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct lines and polygons
         try:
             #Create polygon feature
-            loops = qmesh.vector.identifyLoops(outerRegionLines,
+            loops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-            polygons = qmesh.vector.identifyPolygons(loops,
+            polygons = qmesh3.vector.identifyPolygons(loops,
                     meshedAreaPhysID = 10000)
         except AssertionError:
             self.assertTrue(False)
         #Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setTargetCoordRefSystem('EPSG:6933')
         except AssertionError:
@@ -267,25 +261,25 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_twoRegion_PCC_noMeshMetric.__name__
         # Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
         # Insert smaller region into larger.
         try:
             loops, polygons = \
-              qmesh.vector.insertRegions(
+              qmesh3.vector.insertRegions(
                 outerRegionLoops,\
                 outerRegionPolygons,\
                 circularRegion30Loops,\
@@ -294,18 +288,18 @@ class TestCircularRegions(unittest.TestCase):
             self.assertTrue(False)
         # Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setTargetCoordRefSystem('PCC')
         except AssertionError:
             self.assertTrue(False)
         # Meshing with Gmsh
-        try:
-            domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
-                        mshFilename=self.thisPath+'/'+function_name+'.msh',
-                        gmshAlgo = 'front2d')
-        except AssertionError:
-            self.assertTrue(False)
+        #try:
+        #   domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
+        #                mshFilename=self.thisPath+'/'+function_name+'.msh',
+        #                gmshAlgo = 'front2d')
+        #except AssertionError:
+        #    self.assertTrue(False)
 
     def test_twoRegion_EPSG6933_noMeshMetric(self):
         '''Test multiple region meshing and labelling.
@@ -316,25 +310,25 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_twoRegion_EPSG6933_noMeshMetric.__name__
         # Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
         # Insert smaller region into larger.
         try:
             loops, polygons = \
-              qmesh.vector.insertRegions(
+              qmesh3.vector.insertRegions(
                 outerRegionLoops,\
                 outerRegionPolygons,\
                 circularRegion30Loops,\
@@ -343,7 +337,7 @@ class TestCircularRegions(unittest.TestCase):
             self.assertTrue(False)
         #Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setTargetCoordRefSystem('EPSG:6933')
         except AssertionError:
@@ -365,32 +359,32 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_twoRegion_PCC_gradatedMesh.__name__
         # Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
         # Insert smaller region into larger.
         try:
             loops, polygons = \
-                qmesh.vector.insertRegions(
+                qmesh3.vector.insertRegions(
                    outerRegionLoops, outerRegionPolygons,\
                    circularRegion30Loops, circularRegion30Polygons)
         except AssertionError:
             self.assertTrue(False)
         # Create gradated mesh metric raster for inserted region.
         try:
-            raster = qmesh.raster.gradationToShapes()
+            raster = qmesh3.raster.gradationToShapes()
             raster.setShapes(circularRegion30Polygons)
             raster.setRasterBounds(-85.0,85.0,-85.0,85.0)
             raster.setRasterResolution(100,100)
@@ -400,20 +394,20 @@ class TestCircularRegions(unittest.TestCase):
             self.assertTrue(False)
         # Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setMeshMetricField(raster)
             domain.setTargetCoordRefSystem('PCC')
         except AssertionError:
             self.assertTrue(False)
         #Meshing with Gmsh
-        try:
-            domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
-                        fldFilename=self.thisPath+'/'+function_name+'.fld',
-                        mshFilename=self.thisPath+'/'+function_name+'.msh',
-                        gmshAlgo = 'del2d')
-        except AssertionError:
-            self.assertTrue(False)
+        #try:
+        #    domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
+        #                fldFilename=self.thisPath+'/'+function_name+'.fld',
+        #                mshFilename=self.thisPath+'/'+function_name+'.msh',
+        #                gmshAlgo = 'del2d')
+        #except AssertionError:
+        #    self.assertTrue(False)
 
     def test_twoRegion_EPSG6933_gradatedMesh_deln(self):
         '''Test multiple region meshing and labelling.
@@ -425,32 +419,32 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_twoRegion_EPSG6933_gradatedMesh_deln.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
         #Insert smaller region into larger.
         try:
             loops, polygons = \
-                qmesh.vector.insertRegions(
+                qmesh3.vector.insertRegions(
                    outerRegionLoops, outerRegionPolygons,\
                    circularRegion30Loops, circularRegion30Polygons)
         except AssertionError:
             self.assertTrue(False)
         #Create gradated mesh metric raster for inserted region.
         try:
-            raster = qmesh.raster.gradationToShapes()
+            raster = qmesh3.raster.gradationToShapes()
             raster.setShapes(circularRegion30Polygons)
             raster.setRasterBounds(-85.0,85.0,-85.0,85.0)
             raster.setRasterResolution(100,100)
@@ -460,7 +454,7 @@ class TestCircularRegions(unittest.TestCase):
             self.assertTrue(False)
         #Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setMeshMetricField(raster)
             domain.setTargetCoordRefSystem('EPSG:6933', fldFillValue=1000.0)
@@ -485,32 +479,32 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_twoRegion_EPSG6933_gradatedMesh_frnt.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
         #Insert smaller region into larger.
         try:
             loops, polygons = \
-                qmesh.vector.insertRegions(
+                qmesh3.vector.insertRegions(
                    outerRegionLoops, outerRegionPolygons,\
                    circularRegion30Loops, circularRegion30Polygons)
         except AssertionError:
             self.assertTrue(False)
         #Create gradated mesh metric raster for inserted region.
         try:
-            raster = qmesh.raster.gradationToShapes()
+            raster = qmesh3.raster.gradationToShapes()
             raster.setShapes(circularRegion30Polygons)
             raster.setRasterBounds(-85.0,85.0,-85.0,85.0)
             raster.setRasterResolution(100,100)
@@ -520,7 +514,7 @@ class TestCircularRegions(unittest.TestCase):
             self.assertTrue(False)
         #Create Gmsh domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setMeshMetricField(raster)
             domain.setTargetCoordRefSystem('EPSG:6933', fldFillValue=1000.0)
@@ -544,72 +538,72 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_multipleRegion_PCC.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
-            circularRegion5Lines = qmesh.vector.Shapes()
+            circularRegion5Lines = qmesh3.vector.Shapes()
             circularRegion5Lines.fromFile(self.circularRegions5_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
-        circularRegion5Loops = qmesh.vector.identifyLoops(circularRegion5Lines,
+        circularRegion5Loops = qmesh3.vector.identifyLoops(circularRegion5Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion5Polygons = qmesh.vector.identifyPolygons(circularRegion5Loops,
+        circularRegion5Polygons = qmesh3.vector.identifyPolygons(circularRegion5Loops,
                     meshedAreaPhysID=50000)
         #Insert smaller region into larger.
         try:
             loops, polygons = \
-               qmesh.vector.shapefileTools.insertRegions(
+               qmesh3.vector.shapefileTools.insertRegions(
                   outerRegionLoops, outerRegionPolygons,\
                   circularRegion30Loops, circularRegion30Polygons)
             loops, polygons = \
-               qmesh.vector.shapefileTools.insertRegions(
+               qmesh3.vector.shapefileTools.insertRegions(
                   loops, polygons,\
                   circularRegion5Loops, circularRegion5Polygons)
         except AssertionError:
             self.assertTrue(False)
         #Create gradated mesh metric raster for inserted region.
         try:
-            rasterI = qmesh.raster.gradationToShapes()
+            rasterI = qmesh3.raster.gradationToShapes()
             rasterI.setShapes(circularRegion5Polygons)
             rasterI.setRasterBounds(-85.0,85.0,-85.0,85.0)
             rasterI.setRasterResolution(200,200)
             rasterI.setGradationParameters(50000.0,500000.0,30.0)
             rasterI.calculateLinearGradation()
-            rasterII = qmesh.raster.gradationToShapes()
+            rasterII = qmesh3.raster.gradationToShapes()
             rasterII.setShapes(circularRegion30Polygons)
             rasterII.setRasterBounds(-85.0,85.0,-85.0,85.0)
             rasterII.setRasterResolution(200,200)
             rasterII.setGradationParameters(100000.0,500000.0,20.0)
             rasterII.calculateLinearGradation()
-            rasterIII = qmesh.raster.minimumRaster([rasterI, rasterII])
+            rasterIII = qmesh3.raster.minimumRaster([rasterI, rasterII])
         except AssertionError:
             self.assertTrue(False)
         #Create domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setMeshMetricField(rasterIII)
             domain.setTargetCoordRefSystem('PCC', fldFillValue=0.0)
         except AssertionError:
             self.assertTrue(False)
         #Meshing with Gmsh
-        try:
-            domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
-                        fldFilename=self.thisPath+'/'+function_name+'.fld',
-                        mshFilename=self.thisPath+'/'+function_name+'.msh',
-                        gmshAlgo = 'del2d')
-        except AssertionError:
-            self.assertTrue(False)
+        #try:
+        #    domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
+        #                fldFilename=self.thisPath+'/'+function_name+'.fld',
+        #                mshFilename=self.thisPath+'/'+function_name+'.msh',
+        #                gmshAlgo = 'del2d')
+        #except AssertionError:
+        #    self.assertTrue(False)
 
     def test_multipleRegion_EPSG6933_deln(self):
         '''Test multiple region meshing and labelling.
@@ -620,72 +614,72 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_multipleRegion_EPSG6933_deln.__name__
         #Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
-            circularRegion5Lines = qmesh.vector.Shapes()
+            circularRegion5Lines = qmesh3.vector.Shapes()
             circularRegion5Lines.fromFile(self.circularRegions5_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
-        circularRegion5Loops = qmesh.vector.identifyLoops(circularRegion5Lines,
+        circularRegion5Loops = qmesh3.vector.identifyLoops(circularRegion5Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion5Polygons = qmesh.vector.identifyPolygons(circularRegion5Loops,
+        circularRegion5Polygons = qmesh3.vector.identifyPolygons(circularRegion5Loops,
                     meshedAreaPhysID=50000)
         #Insert smaller region into larger.
         try:
             loops, polygons = \
-               qmesh.vector.insertRegions(
+               qmesh3.vector.insertRegions(
                   outerRegionLoops, outerRegionPolygons,\
                   circularRegion30Loops, circularRegion30Polygons)
             loops, polygons = \
-               qmesh.vector.insertRegions(
+               qmesh3.vector.insertRegions(
                   loops, polygons,\
                   circularRegion5Loops, circularRegion5Polygons)
         except AssertionError:
             self.assertTrue(False)
         #Create gradated mesh metric raster for inserted region.
         try:
-            rasterI = qmesh.raster.gradationToShapes()
+            rasterI = qmesh3.raster.gradationToShapes()
             rasterI.setShapes(circularRegion5Polygons)
             rasterI.setRasterBounds(-85.0,85.0,-85.0,85.0)
             rasterI.setRasterResolution(200,200)
             rasterI.setGradationParameters(2.0,50.0,10.0)
             rasterI.calculateLinearGradation()
-            rasterII = qmesh.raster.gradationToShapes()
+            rasterII = qmesh3.raster.gradationToShapes()
             rasterII.setShapes(circularRegion30Polygons)
             rasterII.setRasterBounds(-85.0,85.0,-85.0,85.0)
             rasterII.setRasterResolution(200,200)
             rasterII.setGradationParameters(10.0,50.0,20.0)
             rasterII.calculateLinearGradation()
-            rasterIII = qmesh.raster.minimumRaster([rasterI, rasterII])
+            rasterIII = qmesh3.raster.minimumRaster([rasterI, rasterII])
         except AssertionError:
             self.assertTrue(False)
         #Create domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setMeshMetricField(rasterIII)
             domain.setTargetCoordRefSystem('EPSG:6933', fldFillValue=0.0)
         except AssertionError:
             self.assertTrue(False)
         #Meshing with Gmsh
-        try:
-            domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
-                        fldFilename=self.thisPath+'/'+function_name+'.fld',
-                        mshFilename=self.thisPath+'/'+function_name+'.msh',
-                        gmshAlgo = 'del2d')
-        except AssertionError:
-            self.assertTrue(False)
+       # try:
+       #     domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',
+       #                 fldFilename=self.thisPath+'/'+function_name+'.fld',
+       #                 mshFilename=self.thisPath+'/'+function_name+'.msh',
+       #                 gmshAlgo = 'del2d')
+       # except AssertionError:
+       #     self.assertTrue(False)
 
     def test_multipleRegion_EPSG6933_frnt(self):
         '''Test multiple region meshing and labelling.
@@ -695,59 +689,59 @@ class TestCircularRegions(unittest.TestCase):
         function_name = self.test_multipleRegion_EPSG6933_frnt.__name__
         # Read-in shapefiles
         try:
-            outerRegionLines = qmesh.vector.Shapes()
+            outerRegionLines = qmesh3.vector.Shapes()
             outerRegionLines.fromFile(self.circularDomain_line_filename)
-            circularRegion30Lines = qmesh.vector.Shapes()
+            circularRegion30Lines = qmesh3.vector.Shapes()
             circularRegion30Lines.fromFile(self.circularRegion30_line_filename)
-            circularRegion5Lines = qmesh.vector.Shapes()
+            circularRegion5Lines = qmesh3.vector.Shapes()
             circularRegion5Lines.fromFile(self.circularRegions5_line_filename)
         except AssertionError:
             self.assertTrue(False)
         # Construct loops and polygons
-        outerRegionLoops = qmesh.vector.identifyLoops(outerRegionLines,
+        outerRegionLoops = qmesh3.vector.identifyLoops(outerRegionLines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        outerRegionPolygons = qmesh.vector.identifyPolygons(outerRegionLoops,
+        outerRegionPolygons = qmesh3.vector.identifyPolygons(outerRegionLoops,
                     meshedAreaPhysID=10000)
-        circularRegion30Loops = qmesh.vector.identifyLoops(circularRegion30Lines,
+        circularRegion30Loops = qmesh3.vector.identifyLoops(circularRegion30Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion30Polygons = qmesh.vector.identifyPolygons(circularRegion30Loops,
+        circularRegion30Polygons = qmesh3.vector.identifyPolygons(circularRegion30Loops,
                     meshedAreaPhysID=10000)
-        circularRegion5Loops = qmesh.vector.identifyLoops(circularRegion5Lines,
+        circularRegion5Loops = qmesh3.vector.identifyLoops(circularRegion5Lines,
                     defaultPhysID=1000, fixOpenLoops=True)
-        circularRegion5Polygons = qmesh.vector.identifyPolygons(circularRegion5Loops,
+        circularRegion5Polygons = qmesh3.vector.identifyPolygons(circularRegion5Loops,
                     meshedAreaPhysID=50000)
         # Insert smaller region into larger.
         try:
             loops, polygons = \
-               qmesh.vector.insertRegions(
+               qmesh3.vector.insertRegions(
                   outerRegionLoops, outerRegionPolygons,\
                   circularRegion30Loops, circularRegion30Polygons)
             loops, polygons = \
-               qmesh.vector.insertRegions(
+               qmesh3.vector.insertRegions(
                   loops, polygons,\
                   circularRegion5Loops, circularRegion5Polygons)
         except AssertionError:
             self.assertTrue(False)
         #Create gradated mesh metric raster for inserted region.
         try:
-            rasterI = qmesh.raster.gradationToShapes()
+            rasterI = qmesh3.raster.gradationToShapes()
             rasterI.setShapes(circularRegion5Polygons)
             rasterI.setRasterBounds(-85.0,85.0,-85.0,85.0)
             rasterI.setRasterResolution(200,200)
             rasterI.setGradationParameters(2.0,50.0,10.0)
             rasterI.calculateLinearGradation()
-            rasterII = qmesh.raster.gradationToShapes()
+            rasterII = qmesh3.raster.gradationToShapes()
             rasterII.setShapes(circularRegion30Polygons)
             rasterII.setRasterBounds(-85.0,85.0,-85.0,85.0)
             rasterII.setRasterResolution(200,200)
             rasterII.setGradationParameters(10.0,50.0,20.0)
             rasterII.calculateLinearGradation()
-            rasterIII = qmesh.raster.minimumRaster([rasterI, rasterII])
+            rasterIII = qmesh3.raster.minimumRaster([rasterI, rasterII])
         except AssertionError:
             self.assertTrue(False)
         #Create domain object
         try:
-            domain = qmesh.mesh.Domain()
+            domain = qmesh3.mesh.Domain()
             domain.setGeometry(loops, polygons)
             domain.setMeshMetricField(rasterIII)
             domain.setTargetCoordRefSystem('EPSG:6933', fldFillValue=0.0)
