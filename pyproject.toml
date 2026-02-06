@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qmesh3"
+version = "1.0.4"
+description = "Finite Element meshes from GIS data."
+readme = "README.rst"
+authors = [
+    { name = "The QMesh Development Team", email = "develop@qmesh.org" }
+]
+license = { text = "GPLv3" }
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+keywords = ["GIS", "mesh generation"]
+dependencies = [
+    "gitpython",
+]
+requires-python = ">=3.7"  # Adjust based on your actual support needs
+
+[project.urls]
+Homepage = "http://www.qmesh.org"
+Download = "https://github.com/acse-ra2617/qmesh3/releases/tag/1.0.3"
+
+[tool.setuptools]
+packages = [
+    "qmesh3",
+    "qmesh3.lib",
+    "qmesh3.vector",
+    "qmesh3.mesh",
+    "qmesh3.raster",
+    "qmesh3.publish"
+]
+
+[tool.setuptools.package-dir]
+"qmesh3" = "qmesh3"
+"qmesh3.lib" = "qmesh3/lib"
+"qmesh3.vector" = "qmesh3/vector"
+"qmesh3.mesh" = "qmesh3/mesh" 
+"qmesh3.raster" = "qmesh3/raster"
+"qmesh3.publish" = "qmesh3/publish"
+"setuptools_qmesh" = "setuptools_qmesh"
+
+[project.scripts]
+qmesh = "qmesh3.cli:main"
