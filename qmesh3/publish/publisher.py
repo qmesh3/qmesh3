@@ -109,7 +109,7 @@ class Publisher:
             LOG.info("Current list of input files to publish: %s" % files)
 
             # Add in any additional files that the user wants to publish
-            extras = raw_input("""
+            extras = input("""
 Please enter any additional (relative) paths to input files that you want to publish.
 The paths should be provided in a Python list of strings (e.g. [\"file1.txt\", \"file2.txt\"]).
 If there are no additional files, just press Enter to continue.
@@ -119,7 +119,7 @@ If there are no additional files, just press Enter to continue.
                
          elif(publication_type == "o"):
             # Get all output data file paths directly from the user.
-            files = raw_input("""
+            files = input("""
 Please enter all (relative) paths to the output files that you want to publish.
 The paths should be provided in a Python list of strings (e.g. [\"file1.txt\", \"file2.txt\"]).
 If there are no additional files, just press Enter to continue.

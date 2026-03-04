@@ -1,4 +1,5 @@
-#    Copyright (C) 2017 Alexandros Avdis and others. See the AUTHORS file for a full list of copyright holders.
+#    Copyright (C) 2017 Alexandros Avdis and others.
+#    See the AUTHORS file for a full list of copyright holders.
 #
 #    This file is part of QMesh.
 #
@@ -16,11 +17,14 @@
 #    along with QMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Logging-related functions to set up a logger which outputs coloured text. This is based on the code by 'airmind' on Stack Overflow:
+# Logging-related functions to set up a logger which outputs coloured text.
+# This is based on the code by 'airmind' on Stack Overflow:
 # http://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 
 import logging
 import qgis.core
+import queue
+import threading
 
 _BLACK, _RED, _GREEN, _YELLOW, _BLUE, _MAGENTA, _CYAN, _WHITE = range(8)
 
@@ -62,12 +66,12 @@ class ColoredFormatter(logging.Formatter):
             levelname_color = _COLOR_SEQ % (30 + _COLORS[levelname]) + levelname + _RESET_SEQ
             record.levelname = levelname_color
         return logging.Formatter.format(self, record)
-        
+
 # Custom logger with multiple destinations
 def ColoredLogger(name):
     FORMAT = "[$BOLD%(name)s$RESET] %(levelname)s: %(message)s"
     COLOR_FORMAT = formatter_message(FORMAT, True)
-    logger = logging.getLogger(name)                
+    logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     color_formatter = ColoredFormatter(COLOR_FORMAT)
     consoleHandler = logging.StreamHandler()
@@ -76,7 +80,7 @@ def ColoredLogger(name):
     return logger
 
 LOG = ColoredLogger("qmesh")
-      
+
 def setLogOutputFile(path):
     FORMAT = "[$BOLD%(name)s$RESET] %(levelname)s: %(message)s"
     COLOR_FORMAT = formatter_message(FORMAT, True)
@@ -85,47 +89,52 @@ def setLogOutputFile(path):
     file_handler.setFormatter(color_formatter)
     LOG.addHandler(file_handler)
     LOG.info('qmesh log output also copied to file '+path)
-      
+
 class _subprocess_log_queue():
-  def __init__(self, subproc, subproc_name, stdoutFileName, stderrFileName):
-    import queue
-    import threading
-    self.stdOutErrQueue = queue.Queue()
-    self.subproc = subproc
-    self.stdoutFileName = stdoutFileName
-    self.stderrFileName = stderrFileName
-    stdout_parser_thread = threading.Thread(target=self.stdout_parser,
+
+    def __init__(self, subproc, subproc_name, stdoutFileName, stderrFileName):
+
+        self.stdOutErrQueue = queue.Queue()
+        self.subproc = subproc
+        self.stdoutFileName = stdoutFileName
+        self.stderrFileName = stderrFileName
+        stdout_parser_thread = threading.Thread(target=self.stdout_parser,
                                             name=subproc_name+'_stdout_parser')
-    stderr_parser_thread = threading.Thread(target=self.stderr_parser,
+        stderr_parser_thread = threading.Thread(target=self.stderr_parser,
                                             name=subproc_name+'_stderr_parser')
-    stdout_parser_thread.start()
-    stderr_parser_thread.start()
-  def stdout_parser(self):
-    '''Capture subprocess stdout and store in queue object'''
-    stdoutFile = open(self.stdoutFileName,'r')
-    while True:
-      line = stdoutFile.readline()
-      if len(line.split()) != 0:
-        self.stdOutErrQueue.put(line)
-      elif len(line.split()) == 0 and self.subproc.poll() is not None:
-        stdoutFile.close()
-        break
-  def stderr_parser(self):
-    '''Capture subprocess stderr and store in queue object'''
-    stderrFile = open(self.stderrFileName, 'r')
-    while True:
-      line = stderrFile.readline()
-      if len(line.split()) != 0:
-        self.stdOutErrQueue.put(line)
-      elif len(line.split()) == 0 and self.subproc.poll() is not None:
-        stderrFile.close()
-        break
-  def emptyQueue(self):
-     '''Check the queue storing stdout and stderr messages, and return True if it is empty. Return False if not empty'''
-     return self.stdOutErrQueue.empty()
-  def getLine(self):
-     line = self.stdOutErrQueue.get(True,0.5)
-     return line
+        stdout_parser_thread.start()
+        stderr_parser_thread.start()
+
+    def stdout_parser(self):
+        '''Capture subprocess stdout and store in queue object'''
+        stdoutFile = open(self.stdoutFileName,'r')
+        while True:
+            line = stdoutFile.readline()
+            if len(line.split()) != 0:
+                self.stdOutErrQueue.put(line)
+            elif len(line.split()) == 0 and self.subproc.poll() is not None:
+                stdoutFile.close()
+            break
+
+    def stderr_parser(self):
+        '''Capture subprocess stderr and store in queue object'''
+        stderrFile = open(self.stderrFileName, 'r')
+        while True:
+            line = stderrFile.readline()
+            if len(line.split()) != 0:
+                self.stdOutErrQueue.put(line)
+            elif len(line.split()) == 0 and self.subproc.poll() is not None:
+                stderrFile.close()
+            break
+
+    def emptyQueue(self):
+        '''Check the queue storing stdout and stderr messages,
+        and return True if it is empty. Return False if not empty'''
+        return self.stdOutErrQueue.empty()
+
+    def getLine(self):
+        line = self.stdOutErrQueue.get(True,0.5)
+        return line
 
 def initialise():
     LOG.warning("The initialise method is deprecated and will be removed in a future version.")

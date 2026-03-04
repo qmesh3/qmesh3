@@ -300,11 +300,11 @@ class Circle(Line):
         self.centerPointXi = centerPointXi
         self.centerPointEta = centerPointEta
         if radius < 0:
-            raise badArguments('Circle radious must be positive.')
+            raise BadArguments('Circle radious must be positive.')
         else:
             self.radius = radius
         if numbPoints < 3:
-            raise badArguments('Must allow at least three points on the circle periphery.')
+            raise BadArguments('Must allow at least three points on the circle periphery.')
         else:
             self.numbPoints = numbPoints
         # Generate the points around the circle. Starting from the East, going around in an anti-clockwise fashion.

@@ -19,6 +19,7 @@ import qgis.core
 import logging
 import numpy
 import datetime
+from ..__init__ import BadGeometry
 from ..__init__ import __git_sha_key__
 from ..__init__ import __version__
 from ..__init__ import GFD_basisChangeTools
@@ -999,8 +1000,8 @@ class Mesh():
               LOG.info('Read in '+str(boundaryEdge_counter)+' 2-node edges on boundaries.')
           if len(triangles) > 0:
               LOG.info('Read in '+str(len(triangles))+' 3-node triangles.')
-          if quadrangle_counter > 0:
-              LOG.info('Read in '+str(len(quads))+' 4-node quadrangles')
+          #if quadrangle_counter > 0:
+          #    LOG.info('Read in '+str(len(quads))+' 4-node quadrangles')
           #TBU LOG.info('Read in '+str(len(tets))+' tets.')
           #TBU LOG.info('Read in '+str(len(hexes))+' hexes.')
           #The list "triangles" is a connectivity table, where for each element
@@ -1147,7 +1148,7 @@ class Mesh():
               if targetCoordReferenceSystem.toWkt != self.crs.toWkt:
                   LOG.info('Converting mesh vertices to target reference'+
                            ' coordinate system: '+str(targetCoordReferenceSystem.description()))
-                  CoordTransformer = qgis.core.QgsCoordinateTransform(sourceCRS, 
+                  CoordTransformer = qgis.core.QgsCoordinateTransform(self.crs, 
                                                                       targetCoordReferenceSystem,
                                                                       qgis.core.QgsProject.instance())
                   # Check if coordinate transformation is correctly initialised

@@ -22,6 +22,9 @@ import os
 import sys
 from ..lib import Trees as Trees
 import qgis.core
+from ..__init__ import BadGeometry
+from ..__init__ import BadArguments
+
 
 
 import logging
@@ -577,7 +580,7 @@ class Shapes(object):
                 multiPoints = featureGeometry.asMultiPoint()
                 for point in multiPoints:
                     newFeature = qgis.core.QgsFeature()
-                    newfeature.setGeometry(qgis.core.QgsGeometry.fromPoint(point))
+                    newFeature.setGeometry(qgis.core.QgsGeometry.fromPoint(point))
                     #Set fields and attributes of new lines, by copying the fields
                     # and attributes of the multi-line.
                     newFeature.setFields(fields)
@@ -647,7 +650,7 @@ class Shapes(object):
             if self.getCoordRefSystem().authid()!='EPSG:4326':
                 msg = 'Global geometries must be given in EPSG:4326. The Coordinate '+\
                       ' Reference System detected is '+\
-                      contiguousLinesShapes.getCoordRefSystem().authid()+' .'
+                      self.getCoordRefSystem().authid()+' .'
                 LOG.error(msg)
                 raise Exception('Incorrect Coordinate Reference System.')
             self.projectLonLatToUnitDisk()
@@ -1765,14 +1768,3 @@ def identifyPolygons(loopShapes,
         loopShapes.projectUnitDiskToLonLat()
     return outputShapes
 
-class BadArguments(Exception):
-    def __init__(self, message):
-        self.message=message
-    def __str__(self):
-        return self.message
-
-class BadGeometry(Exception):
-    def __init__(self, message):
-        self.message=message
-    def __str__(self):
-        return self.message

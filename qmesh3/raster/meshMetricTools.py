@@ -20,6 +20,9 @@ import sys
 import numpy as np
 
 import logging
+from ..__init__ import BadGeometry
+from ..__init__ import BadArguments
+
 LOG = logging.getLogger(__package__)
 
 class raster(object):
@@ -367,7 +370,7 @@ class raster(object):
         # If user has specified a named variable to load in, check it actually
         # is in the list. Otherwise load the first varible found in file.
         if loadInVariableName!=None and loadInVariableName not in variableNames:
-            msg='ERROR: Variable named '+loadInVariable+\
+            msg='ERROR: Variable named '+loadInVariableName +\
                 ' not found in file '+inputFileName+'\n'
             raise Exception(msg)
         else:
