@@ -18,9 +18,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v3
+    - name: Pull qgis image
+      run: docker pull qgis/qgis
+
+    - name: Update pip
+      run: docker run --net=host --volume `pwd`:/app -w=/app qgis/qgis sh -c "python3 -m pip install --upgrade pip"  
+    - name: Run tests
+      run: docker run --net=host --volume $(pwd):/app -w=/app qgis/qgis sh -c "python3 -m pip install -r requirements.txt && xvfb-run -s '+extension GLX -screen 0 1024x768x24' pytest tests"
+    
     - uses: actions/checkout@v4
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
+      
       with:
         python-version: "3.10"
     - name: Install dependencies
