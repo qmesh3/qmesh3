@@ -386,7 +386,7 @@ del writer
 #Open polygon file
 polygonWriter = qgis.core.QgsVectorFileWriter(outputPolygonFilename, "CP1250", fields, qgis.core.QgsWkbTypes.MultiPolygon, coordinateReferenceSystem, "ESRI Shapefile")
 if polygonWriter.hasError() != qgis.core.QgsVectorFileWriter.NoError:
-  print("Error when creating polygon shapefile: ", writer.hasError())
+  print("Error when creating polygon shapefile: ", polygonWriter.hasError())
 
 #Create polygon features
 

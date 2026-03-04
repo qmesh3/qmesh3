@@ -18,8 +18,8 @@
 #    along with QMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import sys
 
-@unittest.skip("Too slow")
 class TestOrkneyShetlandIsles(unittest.TestCase):
     '''Todo: add test documentation as class docstring '''
     def setUp(self):
@@ -175,6 +175,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
         for filename in self.output_files:
             self.remove_file(filename)
 
+    @unittest.skip("Too slow")    
     def test_OrkneyShetlandIsles_UTM30(self):
         '''Meshing around the Orkney and Shteland Isles in UTM30 as a regression test.'''
         try:
@@ -186,6 +187,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             except ImportError:
                 sys.path.append(self.project_root_path)
                 import qmesh3
+            qmesh3.LOG.setLevel('WARNING')        
             #Read-in the shapefile describing the domain boundaries, and creating a gmsh file.
             boundaries = qmesh3.vector.Shapes()
             boundaries.fromFile(self.all_boundaries_vector_filename)
@@ -283,6 +285,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             loopShapes = qmesh3.vector.identifyLoops(boundaries, isGlobal=False,
                                                     defaultPhysID=1000, fixOpenLoops=True)
             polygonShapes = qmesh3.vector.identifyPolygons(loopShapes, smallestNotMeshedArea=50000)
+            print("1")
             #Create loops and polygons for Inner Sound
             innerSound_plot_lines = qmesh3.vector.Shapes()
             innerSound_plot_lines.fromFile(self.innerSound_plot_vector_filename)
@@ -290,6 +293,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
                                                                fixOpenLoops=True)
             innerSound_plot_polygon = qmesh3.vector.identifyPolygons(innerSound_plot_loops, 
                                                                     meshedAreaPhysID = 2)
+            print("2")
             #Create raster for mesh gradation towards full-resolution shorelines.
             GSHHS_fine_boundaries = qmesh3.vector.Shapes()
             GSHHS_fine_boundaries.fromFile(self.GSHHS_f_vector_filename)
@@ -300,6 +304,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             gradationRaster_shoreline.setGradationParameters(150.0,15000.0,1.0)
             gradationRaster_shoreline.calculateLinearGradation()
             gradationRaster_shoreline.writeNetCDF(self.GSHHS_f_gradation_raster_filename)
+            print("3")
             #Create raster for mesh gradation towards Shetlands shorelines.
             shetlands_shorelines = qmesh3.vector.Shapes()
             shetlands_shorelines.fromFile(self.shetlands_shoreline_vector_filename)
@@ -311,6 +316,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             gradationRaster_shetlands_shoreline.calculateLinearGradation()
             gradationRaster_shetlands_shoreline.writeNetCDF(
                 self.shetlands_shoreline_gradation_raster)
+            print("4")
             #Create raster for mesh gradation towards 0m gebco contour on the Scottish mainland.
             scotlald_shoreline_GEBCO08 = qmesh3.vector.Shapes()
             scotlald_shoreline_GEBCO08.fromFile(self.scotlald_shoreline_GEBCO08_vector_filename)
@@ -321,6 +327,8 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             gradationRaster_GEBCO08_0mContour.setGradationParameters(1500.0,15000.0,0.5)
             gradationRaster_GEBCO08_0mContour.calculateLinearGradation()
             gradationRaster_GEBCO08_0mContour.writeNetCDF(self.gradation_GEBCO08_0mContour_filename)
+            print("5")
+
             #Create raster for mesh gradation towards GSHHS high-resolution lines on the Scottish mainland coast
             GSHHS_h_L1_lines = qmesh3.vector.Shapes()
             GSHHS_h_L1_lines.fromFile(self.GSHHS_h_vector_filename)
@@ -331,6 +339,8 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
             gradationRaster_GSHHS_h_L1_lines.setGradationParameters(1500.0,15000.0,0.5)
             gradationRaster_GSHHS_h_L1_lines.calculateLinearGradation()
             gradationRaster_GSHHS_h_L1_lines.writeNetCDF(self.GSHHS_h_gradation_raster_filename)
+            print("6")
+
             #Create raster for mesh gradation towards Inner Sound plot
             gradationRaster_innerSound_plot = qmesh3.raster.gradationToShapes()
             gradationRaster_innerSound_plot.setShapes(innerSound_plot_polygon)
@@ -346,6 +356,8 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
                                                            gradationRaster_GSHHS_h_L1_lines, \
                                                            gradationRaster_innerSound_plot])
             meshMetricRaster.writeNetCDF(self.meshMetric_raster_filename)
+            print("7")
+
             #Generate mesh
             domain = qmesh3.mesh.Domain()
             domain.setGeometry(loopShapes, polygonShapes)
@@ -357,6 +369,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
         except AssertionError:
             self.assertTrue(False)
 
+    @unittest.skip("Too slow")
     def test_OrkneyShetlandIsles_PCC_tidalSites(self):
         '''Todo: add docstring '''
         try:
@@ -453,6 +466,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
         except AssertionError:
             self.assertTrue(False)
 
+    @unittest.skip("Too slow")
     def test_OrkneyShetlandIsles_PCC_InnerSoundTurbines(self):
         '''Todo: add docstring '''
         try:
