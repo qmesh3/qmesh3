@@ -19,7 +19,8 @@ import qgis.core
 import logging
 import numpy
 import datetime
-from ..__init__ import BadGeometry
+from ..lib.exceptions import BadGeometry
+from ..lib.exceptions import BadArguments
 from ..__init__ import __git_sha_key__
 from ..__init__ import __version__
 from ..__init__ import GFD_basisChangeTools

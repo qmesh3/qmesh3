@@ -20,8 +20,8 @@ import sys
 import numpy as np
 
 import logging
-from ..__init__ import BadGeometry
-from ..__init__ import BadArguments
+from ..lib.exceptions import BadGeometry
+from ..lib.exceptions import BadArguments
 
 LOG = logging.getLogger(__package__)
 

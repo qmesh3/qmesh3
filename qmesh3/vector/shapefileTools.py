@@ -22,9 +22,8 @@ import os
 import sys
 from ..lib import Trees as Trees
 import qgis.core
-from ..__init__ import BadGeometry
-from ..__init__ import BadArguments
-
+from ..lib.exceptions import BadGeometry
+from ..lib.exceptions import BadArguments
 
 
 import logging

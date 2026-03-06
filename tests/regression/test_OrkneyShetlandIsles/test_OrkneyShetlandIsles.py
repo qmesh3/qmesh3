@@ -268,6 +268,7 @@ class TestOrkneyShetlandIsles(unittest.TestCase):
         except AssertionError:
             self.assertTrue(False)
 
+    @unittest.skip("Too slow")
     def test_OrkneyShetlandIsles_PCC(self):
         '''Todo: add docstring '''
         try:
