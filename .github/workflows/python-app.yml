@@ -9,41 +9,33 @@ on:
   pull_request:
     branches: [ "master" ]
 
-permissions:
-  contents: read
-
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
+    container: qgis/qgis:release-3_34
     steps:
-    - uses: actions/checkout@v3
-    - name: Pull qgis image
-      run: docker pull qgis/qgis
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Update pip
-      run: docker run --net=host --volume `pwd`:/app -w=/app qgis/qgis sh -c "python3 -m pip install --upgrade pip"  
-    - name: Run tests
-      run: docker run --net=host --volume $(pwd):/app -w=/app qgis/qgis sh -c "python3 -m pip install -r requirements.txt && xvfb-run -s '+extension GLX -screen 0 1024x768x24' pytest tests"
-    
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest
+      - name: Configure Environment
+        run: |
+          # These paths are standard for the official QGIS Docker image
+          echo "PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Test with pytest
+        run: |
+          # xvfb-run is usually pre-installed in the QGIS image
+          # it provides a virtual display for the QGIS/Qt engine
+          xvfb-run pytest
