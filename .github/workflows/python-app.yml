@@ -37,10 +37,10 @@ jobs:
 
       - name: Debug File System
         run: |
-        echo "--- Current Directory Structure ---"
-        find qmesh3 -maxdepth 2
-        echo "--- Python Path ---"
-        python3 -c "import sys; print('\n'.join(sys.path))"
+          echo "--- Current Directory Structure ---"
+          find qmesh3 -maxdepth 2
+          echo "--- Python Path ---"
+          python3 -c "import sys; print('\n'.join(sys.path))"
       
       - name: Test with pytest
         run: |
