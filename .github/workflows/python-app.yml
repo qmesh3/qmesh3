@@ -39,4 +39,5 @@ jobs:
         run: |
           # xvfb-run is usually pre-installed in the QGIS image
           # it provides a virtual display for the QGIS/Qt engine
-          xvfb-run pytest
+          export PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python
+          xvfb-run python3 -m pytest tests/
