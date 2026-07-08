@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qmesh3"
-version = "1.0.4"
+version = "1.0.5"
 description = "Finite Element meshes from GIS data."
-readme = "README.rst"
+readme = "README.md"
 authors = [
     { name = "The QMesh Development Team", email = "develop@qmesh.org" }
 ]
