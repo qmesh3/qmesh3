@@ -18,6 +18,7 @@
 import qgis.core
 import sys
 import numpy as np
+import scipy.io as sio
 
 import logging
 from ..lib.exceptions import BadGeometry
@@ -351,10 +352,9 @@ class raster(object):
         :arg str crs_string: The name of the coordinate reference system. This is optional.
         :arg str loadInVariableName: The name of the variable in the input file to be read in. This is optional.
         """
-        from scipy.io import netcdf
         LOG.info("Reading NetCDF file "+inputFileName)
         # Open input netCDF raster file.
-        inputNetCDF = netcdf.NetCDFFile(inputFileName, 'r')
+        inputNetCDF = sio.NetCDFFile(inputFileName, 'r')
         # Read-in dimension names
         dimensionNames = list(inputNetCDF.dimensions.keys())
         # We expect exactly two dimensions. Raise exception otherwise
@@ -515,7 +515,7 @@ class raster(object):
         from scipy.io import netcdf
         LOG.info('Writing NetCDF file '+outputFileName)
         #Open output netCDF raster file.
-        outputNetCDF = netcdf.NetCDFFile(outputFileName, 'w')
+        outputNetCDF = sio.netcdf_file(outputFileName, 'w')
         #Create the dimensions.
         outputNetCDF.createDimension(xiName, self.numb_xiPoints)
         outputNetCDF.createDimension(etaName, self.numb_etaPoints)

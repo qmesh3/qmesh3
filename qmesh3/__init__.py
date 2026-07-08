@@ -24,7 +24,9 @@ import qmesh3.publish
 import qmesh3.lib
 from qmesh3.config import *
 import atexit
-import pkg_resources
+import importlib.metadata
+
+
 # Suppress verbose debugging Qt messages
 os.environ['QT_LOGGING_RULES'] = "qt5ct.debug=false"
 # Make sure qmesh can run in environments without graphics
@@ -61,9 +63,8 @@ _check_env()
 
 #Set the version attribute
 try:
-    __packaged_distro__ = pkg_resources.get_distribution('qmesh3')
-    __version__ = __packaged_distro__.version
-except (pkg_resources.DistributionNotFound, AttributeError, NameError):
+    __version__ = importlib.metadata.version("qmesh3")
+except importlib.metadata.PackageNotFoundError:
     __version__ = "local"
     LOG.warning('Could not find qmesh version information. Provenance information is incomplete.')
 #Set the git-sha-key attribute

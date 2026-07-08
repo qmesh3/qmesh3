@@ -22,6 +22,7 @@ import os
 import sys
 from ..lib import Trees as Trees
 import qgis.core
+from qgis.PyQt.QtCore import QMetaType
 from ..lib.exceptions import BadGeometry
 from ..lib.exceptions import BadArguments
 
@@ -343,9 +344,17 @@ class Shapes(object):
         LOG.info('Writing file '+outputFileName+' ...')
         # Write output shapefile: Open file and check for writer error.
         # Then write features and close file.
-        fileWriter = qgis.core.QgsVectorFileWriter(outputFileName,
-                   "CP1250", self.fields, self.shapeType, self.getCoordRefSystem(),
-                   "ESRI Shapefile")
+        options = qgis.core.QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = "ESRI Shapefile"
+        options.fileEncoding = "CP1250"
+        fileWriter = qgis.core.QgsVectorFileWriter.create(
+                outputFileName,
+                self.fields,
+                self.shapeType,
+                self.getCoordRefSystem(),
+                qgis.core.QgsCoordinateTransformContext(),
+                options
+            )
         if fileWriter.hasError() != qgis.core.QgsVectorFileWriter.NoError:
             raise Exception('Error when creating shapefile '+outputFileName+
                         ' : '+str(fileWriter.hasError()))
@@ -1251,8 +1260,8 @@ def identifyLoops(inputShapes,
         LOG.debug('    Found physical ID attribute in line-shapefile as field with index '+str(PhysIDIndex))
         haveLinePhysID = True
     #
-    loopIDfield = qgis.core.QgsField("LoopID", PyQt.QtCore.QVariant.Int)
-    physIDfield = qgis.core.QgsField("PhysID", PyQt.QtCore.QVariant.Int)
+    loopIDfield = qgis.core.QgsField("LoopID", QMetaType.Type.Int)
+    physIDfield = qgis.core.QgsField("PhysID", QMetaType.Type.Int)
     fields = qgis.core.QgsFields()
     fields.append(loopIDfield)
     fields.append(physIDfield)
@@ -1748,7 +1757,7 @@ def identifyPolygons(loopShapes,
     outputShapes.southPoleCoordinates = loopShapes.southPoleCoordinates
     outputShapes.setShapeType(qgis.core.QgsWkbTypes.Polygon)
     physIDField = qgis.core.QgsField("PhysID",
-                                    PyQt.QtCore.QVariant.Int)
+                                    QMetaType.Type.Int)
     fields = qgis.core.QgsFields()
     fields.append(physIDField)
     outputShapes.setFields(fields)
