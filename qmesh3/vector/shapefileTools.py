@@ -1195,7 +1195,7 @@ def insertRegions(receivingLines, receivingPolygons,
         output_polygonFeatures.append(ins_feature)
     #Create Shapes-objects for output-lines and output-polygons.
     physicalIDfield = qgis.core.QgsField("PhysID",
-                                    PyQt.QtCore.QVariant.Int)
+                                    QMetaType.Type.Int)
     fields = receivingLines.getFields()
     outputLines = Shapes()
     outputLines.setCoordRefSystem(receiving_lines_crs)
