@@ -1195,7 +1195,7 @@ def insertRegions(receivingLines, receivingPolygons,
         output_polygonFeatures.append(ins_feature)
     #Create Shapes-objects for output-lines and output-polygons.
     physicalIDfield = qgis.core.QgsField("PhysID",
-                                    QMetaType.Type.Int)
+                                    QMetaType.Int)
     fields = receivingLines.getFields()
     outputLines = Shapes()
     outputLines.setCoordRefSystem(receiving_lines_crs)
@@ -1260,8 +1260,8 @@ def identifyLoops(inputShapes,
         LOG.debug('    Found physical ID attribute in line-shapefile as field with index '+str(PhysIDIndex))
         haveLinePhysID = True
     #
-    loopIDfield = qgis.core.QgsField("LoopID", QMetaType.Type.Int)
-    physIDfield = qgis.core.QgsField("PhysID", QMetaType.Type.Int)
+    loopIDfield = qgis.core.QgsField("LoopID", QMetaType.Int)
+    physIDfield = qgis.core.QgsField("PhysID", QMetaType.Int)
     fields = qgis.core.QgsFields()
     fields.append(loopIDfield)
     fields.append(physIDfield)
@@ -1757,7 +1757,7 @@ def identifyPolygons(loopShapes,
     outputShapes.southPoleCoordinates = loopShapes.southPoleCoordinates
     outputShapes.setShapeType(qgis.core.QgsWkbTypes.Polygon)
     physIDField = qgis.core.QgsField("PhysID",
-                                    QMetaType.Type.Int)
+                                    QMetaType.Int)
     fields = qgis.core.QgsFields()
     fields.append(physIDField)
     outputShapes.setFields(fields)
