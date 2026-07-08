@@ -1194,8 +1194,12 @@ def insertRegions(receivingLines, receivingPolygons,
     for ins_feature in insertedPolygons.getFeatures():
         output_polygonFeatures.append(ins_feature)
     #Create Shapes-objects for output-lines and output-polygons.
-    physicalIDfield = qgis.core.QgsField("PhysID",
-                                    QMetaType.Int)
+    try:
+        from qgis.PyQt.QtCore import QMetaType
+        physIDField = qgis.core.QgsField("PhysID", QMetaType.Int)
+    except (TypeError, AttributeError):
+        from qgis.PyQt.QtCore import QVariant
+        physIDField = qgis.core.QgsField("PhysID", QVariant.Int)
     fields = receivingLines.getFields()
     outputLines = Shapes()
     outputLines.setCoordRefSystem(receiving_lines_crs)
@@ -1260,8 +1264,16 @@ def identifyLoops(inputShapes,
         LOG.debug('    Found physical ID attribute in line-shapefile as field with index '+str(PhysIDIndex))
         haveLinePhysID = True
     #
-    loopIDfield = qgis.core.QgsField("LoopID", QMetaType.Int)
-    physIDfield = qgis.core.QgsField("PhysID", QMetaType.Int)
+    from qgis.PyQt.QtCore import QVariant
+    try:
+        from qgis.PyQt.QtCore import QMetaType
+        # Try the modern QGIS 3.44+ way
+        loopIDfield = qgis.core.QgsField("LoopID", QMetaType.Int)
+        physIDfield = qgis.core.QgsField("PhysID", QMetaType.Int)
+    except (TypeError, AttributeError):
+        # Fallback for QGIS 3.34 on GitHub Actions
+        loopIDfield = qgis.core.QgsField("LoopID", QVariant.Int)
+        physIDfield = qgis.core.QgsField("PhysID", QVariant.Int)
     fields = qgis.core.QgsFields()
     fields.append(loopIDfield)
     fields.append(physIDfield)
@@ -1756,8 +1768,13 @@ def identifyPolygons(loopShapes,
     outputShapes.isGlobal = loopShapes.isGlobal
     outputShapes.southPoleCoordinates = loopShapes.southPoleCoordinates
     outputShapes.setShapeType(qgis.core.QgsWkbTypes.Polygon)
-    physIDField = qgis.core.QgsField("PhysID",
-                                    QMetaType.Int)
+    try:
+        from qgis.PyQt.QtCore import QMetaType
+        physIDField = qgis.core.QgsField("PhysID", QMetaType.Int)
+    except (TypeError, AttributeError):
+        from qgis.PyQt.QtCore import QVariant
+        physIDField = qgis.core.QgsField("PhysID", QVariant.Int)
+
     fields = qgis.core.QgsFields()
     fields.append(physIDField)
     outputShapes.setFields(fields)

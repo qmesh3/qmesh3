@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: qgis/qgis:release-3_44
+    container: qgis/qgis:release-3_34
     steps:
       - name: Checkout
         uses: actions/checkout@v4
