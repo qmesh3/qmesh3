@@ -842,7 +842,7 @@ class Domain(object):
 
         return gmshGeometry
 
-    def gmsh(self, geoFilename=None, fldFilename=None, mshFilename=None, gmshAlgo='del2d', isMshFileBinary=False, verbosityLevel=None):
+    def gmsh(self, geoFilename=None, fldFilename=None, mshFilename=None, gmshAlgo='del2d', isMshFileBinary=False, gmshFormat='msh2', verbosityLevel=None):
         '''Generate mesh using gmsh with specified options
         '''
         import subprocess
@@ -867,6 +867,9 @@ class Domain(object):
             gmshCommand.append(str(verbosityLevel))
         if isMshFileBinary:
             gmshCommand.append('-bin')
+        if gmshFormat is not None:
+            gmshCommand.append('-format')
+            gmshCommand.append(gmshFormat)
         gmshCommand.extend([geoFilename,'-o',mshFilename])
         # Invoke gmsh command
         LOG.info('Meshing with gmsh')
