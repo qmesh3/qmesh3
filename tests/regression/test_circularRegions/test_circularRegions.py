@@ -21,12 +21,12 @@ import unittest
 import numpy as np
 import qgis.core
 import qmesh3
+qmesh3.LOG.setLevel('DEBUG')
 
 class TestCircularRegions(unittest.TestCase):
     '''Test region insertion in qmesh3.'''
 
     def setUp(self):
-        qmesh3.LOG.setLevel('WARNING')
         import os
         self.thisPath = os.path.dirname(os.path.realpath(__file__))
         self.circularDomain_line_filename = self.thisPath+'/test_outerCircle_lines.shp'
@@ -448,7 +448,7 @@ class TestCircularRegions(unittest.TestCase):
             raster.setShapes(circularRegion30Polygons)
             raster.setRasterBounds(-85.0,85.0,-85.0,85.0)
             raster.setRasterResolution(100,100)
-            raster.setGradationParameters(1.0,50.0,20.0)
+            raster.setGradationParameters(50000.0,500000.0,20.0)
             raster.calculateLinearGradation()
         except AssertionError:
             self.assertTrue(False)
@@ -508,7 +508,7 @@ class TestCircularRegions(unittest.TestCase):
             raster.setShapes(circularRegion30Polygons)
             raster.setRasterBounds(-85.0,85.0,-85.0,85.0)
             raster.setRasterResolution(100,100)
-            raster.setGradationParameters(1.0,50.0,20.0)
+            raster.setGradationParameters(50000.0,500000.0,20.0)
             raster.calculateLinearGradation()
         except AssertionError:
             self.assertTrue(False)
@@ -652,14 +652,14 @@ class TestCircularRegions(unittest.TestCase):
             rasterI = qmesh3.raster.gradationToShapes()
             rasterI.setShapes(circularRegion5Polygons)
             rasterI.setRasterBounds(-85.0,85.0,-85.0,85.0)
-            rasterI.setRasterResolution(200,200)
-            rasterI.setGradationParameters(2.0,50.0,10.0)
+            rasterI.setRasterResolution(200.,200.)
+            rasterI.setGradationParameters(10000.0,90000.0,10.0)
             rasterI.calculateLinearGradation()
             rasterII = qmesh3.raster.gradationToShapes()
             rasterII.setShapes(circularRegion30Polygons)
             rasterII.setRasterBounds(-85.0,85.0,-85.0,85.0)
-            rasterII.setRasterResolution(200,200)
-            rasterII.setGradationParameters(10.0,50.0,20.0)
+            rasterII.setRasterResolution(200.,200.)
+            rasterII.setGradationParameters(15000.0,90000.0,20.0)
             rasterII.calculateLinearGradation()
             rasterIII = qmesh3.raster.minimumRaster([rasterI, rasterII])
         except AssertionError:
@@ -727,14 +727,14 @@ class TestCircularRegions(unittest.TestCase):
             rasterI = qmesh3.raster.gradationToShapes()
             rasterI.setShapes(circularRegion5Polygons)
             rasterI.setRasterBounds(-85.0,85.0,-85.0,85.0)
-            rasterI.setRasterResolution(200,200)
-            rasterI.setGradationParameters(2.0,50.0,10.0)
+            rasterI.setRasterResolution(200.,200.)
+            rasterI.setGradationParameters(10000.0,90000.0,10.0)
             rasterI.calculateLinearGradation()
             rasterII = qmesh3.raster.gradationToShapes()
             rasterII.setShapes(circularRegion30Polygons)
             rasterII.setRasterBounds(-85.0,85.0,-85.0,85.0)
-            rasterII.setRasterResolution(200,200)
-            rasterII.setGradationParameters(10.0,50.0,20.0)
+            rasterII.setRasterResolution(200.,200.)
+            rasterII.setGradationParameters(15000.0,90000.0,20.0)
             rasterII.calculateLinearGradation()
             rasterIII = qmesh3.raster.minimumRaster([rasterI, rasterII])
         except AssertionError:
@@ -747,6 +747,7 @@ class TestCircularRegions(unittest.TestCase):
             domain.setTargetCoordRefSystem('EPSG:6933', fldFillValue=0.0)
         except AssertionError:
             self.assertTrue(False)
+        print("Meshing")
         #Meshing with Gmsh
         try:
             domain.gmsh(geoFilename=self.thisPath+'/'+function_name+'.geo',

@@ -558,8 +558,8 @@ class Domain(object):
         # If target CRS is not PCC, we can use EPSG codes to transform to desired CRS
         if self.targetCoordRefSystem_string != 'PCC':
             pass
-            #self.geometryLineShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
-            #self.geometryPolygonShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
+            self.geometryLineShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
+            self.geometryPolygonShapes.changeCoordRefSystem(self.targetCoordRefSystem_string)
         # If target CRS is PCC, we must transform to EPSG:4326, in preparation
         # to the polar stereographic re-projection later when writing the mesh
         # generator geometry file (writeGmshGeoFile)
